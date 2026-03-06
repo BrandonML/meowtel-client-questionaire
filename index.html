@@ -235,6 +235,21 @@
   <button class="client-submit-btn" onclick="clientSubmit()" id="clientSubmitBtn">✅ Submit My Answers</button>
 </div>
 
+<!-- CLIENT CONFIRMATION SCREEN (shown after successful submission) -->
+<div id="clientConfirmation" style="display:none; max-width:900px; margin:0 auto 60px; padding:0 24px;">
+  <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:40px 32px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+    <div style="font-size:52px; margin-bottom:16px;">🐾</div>
+    <h2 style="font-family:'Playfair Display',serif; font-size:24px; margin-bottom:12px; color:var(--ink);">You're all set — thank you!</h2>
+    <p style="font-size:14px; color:var(--muted); max-width:460px; margin:0 auto 24px; line-height:1.7;">Your answers have been received and your sitter is all set with everything they need. If you need to update anything before your reservation, just reach out directly.</p>
+    <div style="background:var(--warm); border-radius:8px; padding:18px 24px; display:inline-block; text-align:left; font-size:14px; line-height:2; color:var(--ink);">
+      <div><strong>Brandon Scivolette</strong></div>
+      <div>💬 Message on <strong>Meowtel</strong></div>
+      <div>📱 Text: <a href="sms:8132396027" style="color:var(--rust); text-decoration:none; font-weight:500;">(813) 239-6027</a></div>
+      <div>✉️ Email: <a href="mailto:bscivolette@gmail.com" style="color:var(--rust); text-decoration:none; font-weight:500;">bscivolette@gmail.com</a></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -553,11 +568,30 @@ function initMode() {
     document.getElementById('sitterActions').style.display = 'none';
     // Hide saved clients panel entirely
     document.getElementById('clientsPanel').style.display = 'none';
+    // Check if this reservation was already submitted from this device
+    const resNum = res.reservationNum || '';
+    const storageKey = 'meowtel_submitted_' + resNum;
+    if (resNum && localStorage.getItem(storageKey)) {
+      showConfirmationScreen();
+      return;
+    }
+
     // Show client submit bar
     document.getElementById('clientSubmitBar').style.display = 'block';
   } catch(e) {
     console.error('Invalid client param', e);
   }
+}
+
+function showConfirmationScreen() {
+  // Hide everything form-related
+  document.getElementById('clientBanner').style.display = 'none';
+  document.getElementById('clientSubmitBar').style.display = 'none';
+  document.querySelector('.form-wrap').style.display = 'none';
+  // Show confirmation
+  document.getElementById('clientConfirmation').style.display = 'block';
+  // Update topbar brand to a simple thank-you
+  document.querySelector('.topbar-brand').innerHTML = '🐾 <span>Meowtel</span>';
 }
 
 function generateLink() {
@@ -608,9 +642,11 @@ async function clientSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    btn.textContent = '✅ Submitted — thank you!';
-    btn.style.background = '#2a6b3a';
-    showToast('Your answers have been submitted. Thank you!', 'success');
+    // Mark this reservation as submitted in localStorage
+    const resNum = (res.reservationNum || '').toString().trim();
+    if (resNum) localStorage.setItem('meowtel_submitted_' + resNum, '1');
+    // Swap to confirmation screen
+    showConfirmationScreen();
   } catch(err) {
     btn.disabled = false;
     btn.textContent = '✅ Submit My Answers';
