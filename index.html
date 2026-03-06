@@ -139,6 +139,31 @@
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
   .btn-blue { background: #1a3a5c; color: white; }
   .btn-blue:hover { background: #2a5a8c; }
+
+  /* COLLAPSIBLE SECTIONS (client mode) */
+  .section.collapsible .section-header { cursor: pointer; user-select: none; }
+  .section.collapsible .section-header:hover { background: #2a2010; }
+  .section-toggle { margin-left: auto; font-size: 13px; color: rgba(255,255,255,0.5); transition: transform 0.2s; flex-shrink: 0; }
+  .section.collapsed .section-toggle { transform: rotate(-90deg); }
+  .section.collapsed .section-questions { display: none; }
+  .section.collapsed .section-next { display: none; }
+  .section-next-wrap { padding: 0 20px 16px; display: flex; justify-content: flex-end; }
+  .section-next-btn { background: none; border: 1px solid var(--border); border-radius: 4px; padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .section-next-btn:hover { border-color: var(--rust); color: var(--rust); }
+
+  /* INTRO TEXT (client mode) */
+  .client-intro { background: #fffbf0; border: 1px solid #e8d48a; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; font-size: 13px; line-height: 1.7; color: var(--ink); }
+  .client-intro strong { color: var(--brown); }
+
+  /* STICKY SUBMIT (client mode) */
+  .sticky-submit { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(250,246,240,0.95); backdrop-filter: blur(6px); border-top: 1px solid var(--border); padding: 12px 24px; display: none; z-index: 90; }
+  .sticky-submit-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .sticky-submit-note { font-size: 12px; color: var(--muted); font-style: italic; }
+  .sticky-submit-btn { padding: 10px 28px; background: #1a3a5c; color: white; border: none; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .sticky-submit-btn:hover { background: #2a5a8c; }
+  .sticky-submit-btn:disabled { background: #8a9aac; cursor: not-allowed; }
+  /* Give form bottom padding so sticky bar doesn't cover last section */
+  body.client-mode .form-wrap { padding-bottom: 80px; }
 </style>
 </head>
 <body>
@@ -245,14 +270,22 @@
       <div><strong>Brandon Scivolette</strong></div>
       <div>💬 Message on <strong>Meowtel</strong></div>
       <div>📱 Text: <a href="sms:8132396027" style="color:var(--rust); text-decoration:none; font-weight:500;">(813) 239-6027</a></div>
-      <div>✉️ Email: <a href="mailto:bscivolette@gmail.com" style="color:var(--rust); text-decoration:none; font-weight:500;">bscivolette@gmail.com</a></div>
+      <div>✉️ Email: <a href="/cdn-cgi/l/email-protection#90f2e3f3f9e6fffcf5e4e4f5d0f7fdf1f9fcbef3fffd" style="color:var(--rust); text-decoration:none; font-weight:500;"><span class="__cf_email__" data-cfemail="335140505a455c5f5647475673545e525a5f1d505c5e">[email&#160;protected]</span></a></div>
     </div>
+  </div>
+</div>
+
+<!-- STICKY SUBMIT (client mode) -->
+<div class="sticky-submit" id="stickySubmit">
+  <div class="sticky-submit-inner">
+    <span class="sticky-submit-note">All sections are optional — fill in what you can.</span>
+    <button class="sticky-submit-btn" id="stickySubmitBtn" onclick="clientSubmit()">✅ Submit My Answers</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SECTIONS = [
   {
     title: "Access to the Home", subtitle: "Start here — most important",
@@ -357,21 +390,58 @@ const SECTIONS = [
   }
 ];
 
-function buildForm() {
+function buildForm(clientMode = false) {
   const body = document.getElementById('formBody');
   body.innerHTML = '';
+
+  // Intro text for client mode — shown above section 1
+  if (clientMode) {
+    const intro = document.createElement('div');
+    intro.className = 'client-intro';
+    intro.innerHTML = `<strong>A few things before you begin:</strong> Every question below is completely optional — skip anything that doesn't apply, or anything you'd rather discuss in person at our meet &amp; greet. There are no wrong answers and no required fields. The goal is simply to give your sitter a helpful head start so your cats get the best possible care. Fill in as much or as little as you like.`;
+    body.appendChild(intro);
+  }
+
   SECTIONS.forEach((sec, si) => {
     const div = document.createElement('div');
-    div.className = 'section';
+    const isFirst = si === 0;
+    div.className = 'section' + (clientMode ? ' collapsible' + (isFirst ? '' : ' collapsed') : '');
+    div.id = 'section_' + si;
+
+    const toggleArrow = clientMode ? '<span class="section-toggle">▼</span>' : '';
+    const nextBtn = clientMode && si < SECTIONS.length - 1
+      ? `<div class="section-next-wrap"><button class="section-next-btn" onclick="nextSection(${si})">Next Section →</button></div>`
+      : '';
+
     div.innerHTML = `
-      <div class="section-header">
+      <div class="section-header" ${clientMode ? `onclick="toggleSection(${si})"` : ''}>
         <div class="section-num">${si + 1}</div>
         <div class="section-title">${sec.title}</div>
         <div class="section-subtitle">${sec.subtitle}</div>
+        ${toggleArrow}
       </div>
-      <div class="section-questions">${sec.questions.map((item, qi) => buildQ(item, si, qi)).join('')}</div>`;
+      <div class="section-questions">${sec.questions.map((item, qi) => buildQ(item, si, qi)).join('')}</div>
+      ${nextBtn}`;
     body.appendChild(div);
   });
+}
+
+function toggleSection(si) {
+  const sec = document.getElementById('section_' + si);
+  if (sec) sec.classList.toggle('collapsed');
+}
+
+function nextSection(si) {
+  // Collapse current
+  const cur = document.getElementById('section_' + si);
+  if (cur) cur.classList.add('collapsed');
+  // Expand next
+  const next = document.getElementById('section_' + (si + 1));
+  if (next) {
+    next.classList.remove('collapsed');
+    // Smooth scroll to it
+    setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
 }
 
 function buildQ(item, si, qi) {
@@ -530,12 +600,6 @@ async function saveToSheets() {
   }
 }
 
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show' + (type ? ' '+type : '');
-  setTimeout(() => t.className = 'toast', 2800);
-}
-
 // ── CLIENT MODE ──
 
 const BASE_URL = 'https://brandonml.github.io/meowtel-client-questionaire/';
@@ -549,6 +613,8 @@ function initMode() {
   // Decode and pre-fill reservation details
   try {
     const res = JSON.parse(atob(encoded));
+    // Rebuild form in client mode (collapsible, intro text, next buttons)
+    buildForm(true);
     setRes(res);
     // Lock all reservation fields so client can't edit them
     document.querySelectorAll('.res-input').forEach(el => el.setAttribute('readonly', true));
@@ -576,8 +642,12 @@ function initMode() {
       return;
     }
 
-    // Show client submit bar
-    document.getElementById('clientSubmitBar').style.display = 'block';
+    // Show sticky submit bar, hide the bottom bar version
+    document.getElementById('stickySubmit').style.display = 'block';
+    document.getElementById('clientSubmitBar').style.display = 'none';
+  document.getElementById('stickySubmit').style.display = 'none';
+    // Add client-mode body class for padding
+    document.body.classList.add('client-mode');
   } catch(e) {
     console.error('Invalid client param', e);
   }
@@ -587,6 +657,7 @@ function showConfirmationScreen() {
   // Hide everything form-related
   document.getElementById('clientBanner').style.display = 'none';
   document.getElementById('clientSubmitBar').style.display = 'none';
+  document.getElementById('stickySubmit').style.display = 'none';
   document.querySelector('.form-wrap').style.display = 'none';
   // Show confirmation
   document.getElementById('clientConfirmation').style.display = 'block';
@@ -625,7 +696,8 @@ function copyLink() {
 
 async function clientSubmit() {
   const btn = document.getElementById('clientSubmitBtn');
-  btn.disabled = true;
+  const stickyBtn = document.getElementById('stickySubmitBtn');
+  btn.disabled = true; if(stickyBtn) { stickyBtn.disabled = true; stickyBtn.textContent = 'Submitting…'; }
   btn.textContent = 'Submitting…';
 
   const res = getRes();
@@ -648,14 +720,21 @@ async function clientSubmit() {
     // Swap to confirmation screen
     showConfirmationScreen();
   } catch(err) {
-    btn.disabled = false;
+     btn.disabled = false;
+    if(stickyBtn) { stickyBtn.disabled = false; stickyBtn.textContent = '✅ Submit My Answers'; }
     btn.textContent = '✅ Submit My Answers';
     showToast('Submission failed — please check your connection and try again.', 'error');
     console.error(err);
   }
 }
 
-buildForm();
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+buildForm(); // sitter mode — initMode may rebuild with clientMode=true
 initMode();
 </script>
 </body>
