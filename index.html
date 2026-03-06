@@ -117,16 +117,39 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.success { background: #2a6b3a; }
   .toast.error { background: #8b1a1a; }
+
+  /* CLIENT MODE */
+  .client-banner { background: linear-gradient(135deg, #1a3a5c, #2a5a8c); color: white; text-align: center; padding: 28px 24px 22px; }
+  .client-banner h2 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 6px; }
+  .client-banner p { font-size: 14px; opacity: 0.82; max-width: 540px; margin: 0 auto; line-height: 1.6; }
+  .client-banner .client-name-tag { display: inline-block; background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 14px; font-size: 13px; margin-top: 10px; }
+  .res-input[readonly] { background: #eef4fa; color: var(--muted); cursor: not-allowed; border-color: #c8dff0; }
+  .res-readonly-badge { font-size: 10px; color: var(--muted); font-style: italic; margin-left: 4px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .client-submit-bar { max-width: 900px; margin: 0 auto 48px; padding: 0 24px; }
+  .client-submit-btn { width: 100%; padding: 15px; font-size: 15px; font-weight: 600; border-radius: 6px; background: #1a3a5c; color: white; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+  .client-submit-btn:hover { background: #2a5a8c; }
+  .client-submit-btn:disabled { background: #8a9aac; cursor: not-allowed; }
+
+  /* LINK MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal { background: white; border-radius: 10px; padding: 28px; max-width: 580px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--ink); }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .modal-url { font-family: monospace; font-size: 11px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 10px 12px; word-break: break-all; color: #333; margin-bottom: 14px; max-height: 90px; overflow-y: auto; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-blue { background: #1a3a5c; color: white; }
+  .btn-blue:hover { background: #2a5a8c; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="topbar-brand">🐾 <span>Meowtel</span> Intake Form</div>
-  <div class="topbar-actions">
+  <div class="topbar-actions" id="sitterActions">
     <button class="btn btn-outline no-print" onclick="toggleClients()">📁 Saved Clients</button>
     <button class="btn btn-outline no-print" onclick="clearForm()">✕ New Form</button>
     <button class="btn btn-outline no-print" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-outline no-print" onclick="generateLink()">🔗 Client Link</button>
     <button class="btn btn-primary no-print" onclick="saveLocal()">💾 Save Local</button>
     <button class="btn btn-gold no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
   </div>
@@ -139,8 +162,28 @@
   </div>
 </div>
 
+<!-- CLIENT BANNER (shown in client mode) -->
+<div id="clientBanner" class="client-banner" style="display:none">
+  <h2>Welcome! Please complete your cat care questionnaire.</h2>
+  <p>Your sitter has pre-filled your reservation details below. Please answer as many questions as you can — the more detail you provide, the better care your cats will receive.</p>
+  <div class="client-name-tag" id="clientNameTag"></div>
+</div>
+
+<!-- LINK MODAL -->
+<div class="modal-overlay" id="linkModal" style="display:none" onclick="if(event.target===this)closeLinkModal()">
+  <div class="modal">
+    <h3>🔗 Client Pre-fill Link</h3>
+    <p>Send this link to your client. When they open it, their reservation details will be pre-loaded and the form will be in client submission mode.</p>
+    <div class="modal-url" id="modalUrl"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border)" onclick="closeLinkModal()">Close</button>
+      <button class="btn btn-blue" onclick="copyLink()">📋 Copy Link</button>
+    </div>
+  </div>
+</div>
+
 <div class="form-wrap">
-  <div class="form-title">Meet &amp; Greet <em>Intake Form</em></div>
+  <div class="form-title" id="formTitle">Meet &amp; Greet <em>Intake Form</em></div>
 
   <div class="res-section">
     <div class="res-header">
@@ -185,6 +228,11 @@
   </div>
 
   <div id="formBody"></div>
+</div>
+
+<!-- CLIENT SUBMIT BAR (shown in client mode only) -->
+<div class="client-submit-bar" id="clientSubmitBar" style="display:none">
+  <button class="client-submit-btn" onclick="clientSubmit()" id="clientSubmitBtn">✅ Submit My Answers</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -473,7 +521,106 @@ function showToast(msg, type='') {
   setTimeout(() => t.className = 'toast', 2800);
 }
 
+// ── CLIENT MODE ──
+
+const BASE_URL = 'https://brandonml.github.io/meowtel-client-questionaire/';
+
+// Detect whether the page was opened with a ?client= param
+function initMode() {
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get('client');
+  if (!encoded) return; // sitter mode — nothing to do
+
+  // Decode and pre-fill reservation details
+  try {
+    const res = JSON.parse(atob(encoded));
+    setRes(res);
+    // Lock all reservation fields so client can't edit them
+    document.querySelectorAll('.res-input').forEach(el => el.setAttribute('readonly', true));
+    // Label locked fields
+    document.querySelectorAll('.res-field label').forEach(el => {
+      if (!el.querySelector('.res-readonly-badge')) {
+        el.insertAdjacentHTML('beforeend', '<span class="res-readonly-badge">(pre-filled)</span>');
+      }
+    });
+    // Show client banner
+    const name = `${res.firstName || ''} ${res.lastName || ''}`.trim();
+    document.getElementById('clientNameTag').textContent = name ? `Hi, ${name}!` : '';
+    document.getElementById('clientBanner').style.display = 'block';
+    // Update form title
+    document.getElementById('formTitle').innerHTML = 'Your Cat Care <em>Questionnaire</em>';
+    // Swap topbar: hide sitter actions, show minimal client topbar
+    document.getElementById('sitterActions').style.display = 'none';
+    // Hide saved clients panel entirely
+    document.getElementById('clientsPanel').style.display = 'none';
+    // Show client submit bar
+    document.getElementById('clientSubmitBar').style.display = 'block';
+  } catch(e) {
+    console.error('Invalid client param', e);
+  }
+}
+
+function generateLink() {
+  if (!validate()) return;
+  const res = getRes();
+  const encoded = btoa(JSON.stringify(res));
+  const url = `${BASE_URL}?client=${encoded}`;
+  document.getElementById('modalUrl').textContent = url;
+  document.getElementById('linkModal').style.display = 'flex';
+}
+
+function closeLinkModal() {
+  document.getElementById('linkModal').style.display = 'none';
+}
+
+function copyLink() {
+  const url = document.getElementById('modalUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Link copied to clipboard!', 'success');
+    closeLinkModal();
+  }).catch(() => {
+    // Fallback for older mobile browsers
+    const el = document.createElement('textarea');
+    el.value = url; document.body.appendChild(el);
+    el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Link copied!', 'success');
+    closeLinkModal();
+  });
+}
+
+async function clientSubmit() {
+  const btn = document.getElementById('clientSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const res = getRes();
+  const payload = {
+    ...res,
+    clientName: `${res.firstName} ${res.lastName}`,
+    answers: getAnswers(),
+    sections: SECTIONS.map(s => ({ title: s.title, questions: s.questions.map(q => ({ q: q.q, notes: q.notes || null })) }))
+  };
+
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    btn.textContent = '✅ Submitted — thank you!';
+    btn.style.background = '#2a6b3a';
+    showToast('Your answers have been submitted. Thank you!', 'success');
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = '✅ Submit My Answers';
+    showToast('Submission failed — please check your connection and try again.', 'error');
+    console.error(err);
+  }
+}
+
 buildForm();
+initMode();
 </script>
 </body>
 </html>
