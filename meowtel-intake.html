@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meowtel Meet & Greet Intake Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --warm: #f0e8d8;
+    --ink: #1a1208;
+    --brown: #6b4c2a;
+    --rust: #c4642a;
+    --gold: #d4a82a;
+    --muted: #8a7560;
+    --border: #d8ccba;
+    --section-bg: #fff9f2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--ink);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+  }
+  .topbar-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .topbar-brand span { color: var(--gold); }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--cream);
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); }
+  .btn-primary {
+    background: var(--rust);
+    color: white;
+  }
+  .btn-primary:hover { background: #b05520; }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .btn-gold:hover { background: #c09820; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* ── CLIENT SELECTOR ── */
+  .client-bar {
+    background: var(--warm);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .client-bar label { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .client-select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: white;
+    color: var(--ink);
+    min-width: 200px;
+  }
+  .client-name-input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--ink);
+    width: 200px;
+  }
+
+  /* ── FORM HEADER ── */
+  .form-header {
+    max-width: 860px;
+    margin: 36px auto 0;
+    padding: 0 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .form-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .form-header h1 em { color: var(--rust); font-style: italic; }
+  .form-meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .form-meta input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink);
+    padding: 2px 4px;
+    width: 160px;
+  }
+  .form-meta input:focus { outline: none; border-bottom-color: var(--rust); }
+
+  /* ── MAIN FORM ── */
+  .form-body {
+    max-width: 860px;
+    margin: 24px auto 60px;
+    padding: 0 24px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .section-subtitle {
+    font-size: 11px;
+    color: rgba(250,246,240,0.55);
+    margin-left: auto;
+    font-style: italic;
+  }
+  .section-questions {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── QUESTION ROW ── */
+  .q-row { display: flex; flex-direction: column; gap: 4px; }
+  .q-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .q-label .q-mark { color: var(--muted); font-weight: 400; margin-right: 4px; }
+  .q-input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: white;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 36px;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .q-input:focus { outline: none; border-color: var(--rust); }
+  .q-input.tall { min-height: 58px; }
+
+  /* ── SAVED CLIENTS PANEL ── */
+  .clients-panel {
+    max-width: 860px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+    display: none;
+  }
+  .clients-panel.open { display: block; }
+  .clients-panel-inner {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .clients-panel h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    margin-bottom: 14px;
+    color: var(--brown);
+  }
+  .client-cards { display: flex; flex-wrap: wrap; gap: 12px; }
+  .client-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    min-width: 180px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .client-card:hover { border-color: var(--rust); box-shadow: 0 2px 8px rgba(196,100,42,0.12); }
+  .client-card-name { font-weight: 600; font-size: 14px; }
+  .client-card-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .client-card-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .empty-state { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  /* ── PRINT ── */
+  @media print {
+    .topbar, .client-bar, .clients-panel, .no-print { display: none !important; }
+    body { background: white; }
+    .section { break-inside: avoid; }
+    .form-header { margin-top: 12px; }
+    .q-input { border: none; border-bottom: 1px solid #ccc; border-radius: 0; background: transparent; }
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">🐾 <span>Meowtel</span> Intake Form</div>
+  <div class="topbar-actions">
+    <button class="btn btn-outline" onclick="toggleClients()">📁 Saved Clients</button>
+    <button class="btn btn-outline no-print" onclick="clearForm()">✕ New Form</button>
+    <button class="btn btn-outline no-print" onclick="window.print()">🖨 Print / PDF</button>
+    <button class="btn btn-primary no-print" onclick="saveClient()">💾 Save Local</button>
+    <button class="btn btn-gold no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
+  </div>
+</div>
+
+
+
+<!-- CLIENT BAR -->
+<div class="client-bar">
+  <label>Client name:</label>
+  <input type="text" class="client-name-input" id="clientName" placeholder="e.g. Johnson family" oninput="updateHeading()">
+  <label style="margin-left:8px">Date:</label>
+  <input type="date" class="client-name-input" id="meetDate" style="width:150px">
+</div>
+
+<!-- SAVED CLIENTS PANEL -->
+<div class="clients-panel" id="clientsPanel">
+  <div class="clients-panel-inner">
+    <h2>Saved Clients</h2>
+    <div class="client-cards" id="clientCards"><p class="empty-state">No clients saved yet.</p></div>
+  </div>
+</div>
+
+<!-- FORM HEADER -->
+<div class="form-header">
+  <div>
+    <h1>Meet & Greet <em>Questions</em></h1>
+    <div class="form-meta">
+      Sitter: <input type="text" id="sitterName" placeholder="Your name"> &nbsp;|&nbsp;
+      Cats: <input type="text" id="catNames" placeholder="Cat names">
+    </div>
+  </div>
+</div>
+
+<!-- FORM BODY -->
+<div class="form-body" id="formBody"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SECTIONS = [
+  {
+    title: "Access to the Home",
+    subtitle: "Start here — most important",
+    questions: [
+      "How will I access the home? (key, keypad, lockbox, concierge, etc.)",
+      "If using a key, where should I keep it during the booking?",
+      "After the final visit, where should I leave the key?",
+      "Is there a backup way to enter if the lock/keypad fails?",
+      "Is there a security system or alarm I need to arm/disarm?",
+      "Should I lock doors and windows when I leave each visit?"
+    ]
+  },
+  {
+    title: "Visit Timing",
+    subtitle: "Clarify expectations upfront",
+    questions: [
+      "Within the morning/afternoon/evening slot, do you have a preferred time, or is any time in that window okay?",
+      "Do the cats expect food at specific times, or are they flexible?",
+      "Is it okay if my visit times vary slightly day to day?"
+    ]
+  },
+  {
+    title: "Feeding",
+    subtitle: "Where mistakes usually happen",
+    questions: [
+      "Where is the cat food located?",
+      "How much should each cat get per feeding?",
+      "Wet food, dry food, or both?",
+      "Do they eat separately or share bowls?",
+      "Are there any treats, and how often should they get them?",
+      "Are there foods they cannot have?"
+    ]
+  },
+  {
+    title: "Water",
+    subtitle: "Often overlooked",
+    questions: [
+      "Where are the water bowls or fountains?",
+      "Should I refresh the water each visit?",
+      "Do they prefer filtered water or anything specific?"
+    ]
+  },
+  {
+    title: "Litter Box",
+    subtitle: "Critical for cats",
+    questions: [
+      "Where are the litter boxes located?",
+      "How often should they be scooped?",
+      "Where are the scooper, litter, and trash bags?",
+      "Where should I dispose of waste?",
+      "Do any cats have litter box issues I should watch for?"
+    ]
+  },
+  {
+    title: "Cat Behavior & Personality",
+    subtitle: "Avoid surprises",
+    questions: [
+      "Are the cats friendly, shy, or cautious with new people?",
+      "Do they usually hide when someone new comes in?",
+      "Do they enjoy playing or being brushed?",
+      "Any behaviors I should know about? (door darting, counter surfing, etc.)"
+    ]
+  },
+  {
+    title: "Health & Emergencies",
+    subtitle: "Cover this completely",
+    questions: [
+      "Any medical issues or medications?",
+      "If medication is needed, how is it given?",
+      "What vet should I contact in an emergency? (name, phone, address)",
+      "Who is the backup contact if I can't reach you?",
+      "What should I do if a cat refuses food or seems sick?"
+    ]
+  },
+  {
+    title: "Photos & Updates",
+    subtitle: "Owners care a lot about this",
+    questions: [
+      "Would you like photos or videos during visits?",
+      "How often would you like updates?",
+      "Is the Meowtel app okay for communication, or do you prefer text?"
+    ]
+  },
+  {
+    title: "House Rules",
+    subtitle: "Avoid awkward misunderstandings",
+    questions: [
+      "Should I bring in mail or packages?",
+      "Should I water any plants?",
+      "Are there rooms the cats shouldn't enter?",
+      "Should I leave lights on/off when I leave?",
+      "Is the thermostat okay to adjust if needed?"
+    ]
+  },
+  {
+    title: "Supplies",
+    subtitle: "Avoid running out",
+    questions: [
+      "Is there extra food and litter available?",
+      "Where are cleaning supplies if a cat throws up or has an accident?",
+      "Where are paper towels / trash bags?"
+    ]
+  },
+  {
+    title: "End of Booking",
+    subtitle: "Clarify final expectations",
+    questions: [
+      "On the final visit, is there anything special you'd like done?",
+      "Should I send a final update before you return?"
+    ]
+  }
+];
+
+// Build form
+function buildForm() {
+  const body = document.getElementById('formBody');
+  body.innerHTML = '';
+  SECTIONS.forEach((sec, si) => {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.innerHTML = `
+      <div class="section-header">
+        <div class="section-num">${si+1}</div>
+        <div class="section-title">${sec.title}</div>
+        <div class="section-subtitle">${sec.subtitle}</div>
+      </div>
+      <div class="section-questions">
+        ${sec.questions.map((q, qi) => `
+          <div class="q-row">
+            <label class="q-label"><span class="q-mark">›</span>${q}</label>
+            <textarea class="q-input${q.length > 80 ? ' tall' : ''}" data-s="${si}" data-q="${qi}" placeholder=""></textarea>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    body.appendChild(div);
+  });
+}
+
+function updateHeading() {}
+
+function getAnswers() {
+  const answers = {};
+  document.querySelectorAll('.q-input').forEach(el => {
+    answers[`${el.dataset.s}_${el.dataset.q}`] = el.value;
+  });
+  return answers;
+}
+
+function loadAnswers(answers) {
+  document.querySelectorAll('.q-input').forEach(el => {
+    const key = `${el.dataset.s}_${el.dataset.q}`;
+    el.value = answers[key] || '';
+  });
+}
+
+function saveClient() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { showToast('Please enter a client name first.'); return; }
+  const date = document.getElementById('meetDate').value;
+  const sitter = document.getElementById('sitterName').value;
+  const cats = document.getElementById('catNames').value;
+  const answers = getAnswers();
+  const clients = getClients();
+  const id = name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+  clients[id] = { id, name, date, sitter, cats, answers, saved: new Date().toISOString() };
+  localStorage.setItem('meowtel_clients', JSON.stringify(clients));
+  renderClientCards();
+  showToast(`✓ Saved: ${name}`);
+}
+
+function getClients() {
+  try { return JSON.parse(localStorage.getItem('meowtel_clients') || '{}'); } catch { return {}; }
+}
+
+function loadClient(id) {
+  const clients = getClients();
+  const c = clients[id];
+  if (!c) return;
+  document.getElementById('clientName').value = c.name || '';
+  document.getElementById('meetDate').value = c.date || '';
+  document.getElementById('sitterName').value = c.sitter || '';
+  document.getElementById('catNames').value = c.cats || '';
+  loadAnswers(c.answers || {});
+  toggleClients(); // close panel
+  showToast(`Loaded: ${c.name}`);
+}
+
+function deleteClient(id) {
+  const clients = getClients();
+  const name = clients[id]?.name;
+  delete clients[id];
+  localStorage.setItem('meowtel_clients', JSON.stringify(clients));
+  renderClientCards();
+  showToast(`Deleted: ${name}`);
+}
+
+function clearForm() {
+  document.getElementById('clientName').value = '';
+  document.getElementById('meetDate').value = '';
+  document.getElementById('sitterName').value = '';
+  document.getElementById('catNames').value = '';
+  document.querySelectorAll('.q-input').forEach(el => el.value = '');
+  showToast('Form cleared — ready for new client');
+}
+
+function toggleClients() {
+  const panel = document.getElementById('clientsPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderClientCards();
+}
+
+function renderClientCards() {
+  const container = document.getElementById('clientCards');
+  const clients = getClients();
+  const list = Object.values(clients).sort((a,b) => b.saved > a.saved ? 1 : -1);
+  if (!list.length) {
+    container.innerHTML = '<p class="empty-state">No clients saved yet.</p>';
+    return;
+  }
+  container.innerHTML = list.map(c => `
+    <div class="client-card">
+      <div class="client-card-name">🐱 ${c.name}</div>
+      <div class="client-card-date">${c.date ? new Date(c.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'No date'}</div>
+      ${c.cats ? `<div class="client-card-date">Cats: ${c.cats}</div>` : ''}
+      <div class="client-card-actions">
+        <button class="btn btn-gold btn-sm" onclick="loadClient('${c.id}')">Load</button>
+        <button class="btn btn-outline btn-sm" style="color:#c00;border-color:#c00" onclick="deleteClient('${c.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── GOOGLE SHEETS INTEGRATION ──
+
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwBuU8h9p18gFbQO62NmAr5w-vJYKWen5wbFLdReTqfCkzr2YQey5Ik6_l_ObLGdvjvKQ/exec';
+
+async function saveToSheets() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { showToast('Please enter a client name first.'); return; }
+
+  showToast('Sending to Google Sheets...');
+
+  const payload = {
+    clientName: name,
+    meetDate: document.getElementById('meetDate').value,
+    sitterName: document.getElementById('sitterName').value,
+    catNames: document.getElementById('catNames').value,
+    answers: getAnswers(),
+    sections: SECTIONS
+  };
+
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showToast('Saved to Google Sheets!');
+    saveClient();
+  } catch (err) {
+    showToast('Failed — check connection and try again.');
+    console.error(err);
+  }
+}
+
+buildForm();
+
+// Set today's date by default
+document.getElementById('meetDate').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
