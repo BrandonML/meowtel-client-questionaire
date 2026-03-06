@@ -283,9 +283,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<div class="toast" id="toast"></div><script>
 const SECTIONS = [
   {
     title: "Access to the Home", subtitle: "Start here — most important",
@@ -645,7 +643,6 @@ function initMode() {
     // Show sticky submit bar, hide the bottom bar version
     document.getElementById('stickySubmit').style.display = 'block';
     document.getElementById('clientSubmitBar').style.display = 'none';
-  document.getElementById('stickySubmit').style.display = 'none';
     // Add client-mode body class for padding
     document.body.classList.add('client-mode');
   } catch(e) {
