@@ -13,15 +13,12 @@
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
   :root {
-    /* Core palette — clean blue */
     --blue:       #2563eb;
     --blue-mid:   #3b82f6;
     --blue-light: #eff6ff;
     --blue-xlt:   #f8fbff;
     --blue-border:#bfdbfe;
     --blue-dark:  #1d4ed8;
-
-    /* Neutrals */
     --ink:        #0f172a;
     --ink-mid:    #334155;
     --muted:      #64748b;
@@ -29,12 +26,8 @@
     --border:     #e2e8f0;
     --bg:         #f8fafc;
     --surface:    #ffffff;
-
-    /* Accent — warm teal for visual interest */
     --teal:       #0d9488;
     --teal-lt:    #f0fdfa;
-
-    /* Status */
     --green:      #059669;
     --red:        #dc2626;
   }
@@ -61,7 +54,6 @@
 
   .topbar-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
-  /* Divider between utility buttons and primary actions */
   .topbar-divider {
     width: 1px; height: 24px;
     background: var(--border);
@@ -74,16 +66,12 @@
     cursor: pointer; border: none; transition: all 0.15s;
     white-space: nowrap; display: inline-flex; align-items: center; gap: 5px;
   }
-
-  /* Utility buttons — subtle, secondary */
   .btn-ghost {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
   }
   .btn-ghost:hover { background: var(--bg); color: var(--ink); border-color: #cbd5e1; }
-
-  /* Primary action — Save to Sheets */
   .btn-primary {
     background: var(--blue-light);
     border: 1px solid var(--blue-border);
@@ -91,8 +79,6 @@
     font-weight: 600;
   }
   .btn-primary:hover { background: #dbeafe; border-color: var(--blue-mid); }
-
-  /* Hero action — Save & Get Link */
   .btn-hero {
     background: var(--blue);
     color: white;
@@ -100,8 +86,6 @@
     box-shadow: 0 1px 3px rgba(37,99,235,0.3);
   }
   .btn-hero:hover { background: var(--blue-dark); box-shadow: 0 2px 8px rgba(37,99,235,0.35); }
-
-  /* Legacy aliases */
   .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-outline:hover { background: var(--bg); color: var(--ink); }
   .btn-gold { background: var(--blue-light); border: 1px solid var(--blue-border); color: var(--blue-dark); font-weight: 600; }
@@ -109,6 +93,56 @@
   .btn-blue { background: var(--blue); color: white; }
   .btn-blue:hover { background: var(--blue-dark); }
   .btn-sm { padding: 5px 11px; font-size: 12px; }
+
+  /* ── MOBILE UTILITY BAR (sitter only, below topbar) ── */
+  /* Hidden by default; shown on mobile via media query */
+  .mobile-utility-bar {
+    display: none;
+  }
+
+  /* ── SITTER STICKY BOTTOM BAR (mobile only) ── */
+  .sitter-sticky-bar {
+    display: none; /* shown via media query on mobile */
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.97); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border); padding: 10px 16px;
+    z-index: 90;
+    box-shadow: 0 -4px 20px rgba(15,23,42,0.08);
+  }
+  .sitter-sticky-bar-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; gap: 10px;
+  }
+  .sitter-sticky-bar-inner .btn {
+    flex: 1; justify-content: center;
+    padding: 11px 10px; font-size: 13px;
+  }
+
+  /* ── MOBILE BREAKPOINT ── */
+  @media (max-width: 640px) {
+    /* Hide desktop action buttons in topbar */
+    .topbar-actions.sitter-desktop { display: none; }
+
+    /* Show mobile utility bar */
+    .mobile-utility-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-utility-bar .btn {
+      flex: 1; justify-content: center;
+      font-size: 12px; padding: 7px 8px;
+    }
+
+    /* Show sitter sticky bottom bar */
+    .sitter-sticky-bar { display: block; }
+
+    /* Add bottom padding to form so sticky bar doesn't overlap */
+    body:not(.client-mode) .form-wrap { padding-bottom: 80px; }
+  }
 
   /* ── SAVED CLIENTS PANEL ── */
   .clients-panel { max-width: 900px; margin: 0 auto; padding: 0 24px; display: none; }
@@ -142,7 +176,7 @@
   }
   .form-title em { color: var(--blue); font-style: italic; }
 
-  /* ── RESERVATION SECTION — sitter (editable) ── */
+  /* ── RESERVATION SECTION ── */
   .res-section {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; margin-bottom: 24px; overflow: hidden;
@@ -179,12 +213,12 @@
   .date-range input { flex: 1; min-width: 140px; }
   .date-range span { font-size: 12px; color: var(--muted); }
 
-  /* ── RESERVATION SECTION — client (read-only pill display) ── */
+  /* Client-mode read-only pill display */
   .res-section.client-view .res-body { display: none; }
   .res-pills {
     padding: 14px 20px 16px;
     display: flex; flex-wrap: wrap; gap: 8px;
-    display: none; /* shown only in client mode */
+    display: none;
   }
   .res-pill {
     display: inline-flex; flex-direction: column;
@@ -241,7 +275,6 @@
   }
   .q-select:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
 
-  /* Pill radio/checkbox */
   .q-radio-group, .q-check-group { display: flex; flex-wrap: wrap; gap: 7px; }
   .q-radio-group label, .q-check-group label {
     display: flex; align-items: center; gap: 6px;
@@ -308,7 +341,6 @@
   .client-banner {
     background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%);
     color: white; text-align: center; padding: 36px 24px 28px;
-    border-bottom: none;
   }
   .client-banner h2 {
     font-family: 'Playfair Display', serif; font-size: 26px;
@@ -326,14 +358,10 @@
     font-size: 18px; font-weight: 600;
     margin-top: 14px; letter-spacing: 0.01em;
   }
-
-  /* Client topbar — light */
   .topbar.client-topbar {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
   }
-
-  /* Res section in client mode — compact pill view */
   .res-input[readonly] {
     background: var(--blue-xlt); color: var(--muted);
     cursor: not-allowed; border-color: var(--blue-border);
@@ -343,8 +371,6 @@
     margin-left: 4px; font-weight: 400;
     text-transform: none; letter-spacing: 0;
   }
-
-  /* Intro text */
   .client-intro {
     background: var(--blue-xlt); border: 1px solid var(--blue-border);
     border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;
@@ -364,7 +390,7 @@
   .client-submit-btn:hover { background: var(--blue-dark); box-shadow: 0 4px 14px rgba(37,99,235,0.35); }
   .client-submit-btn:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
 
-  /* Sticky submit */
+  /* Sticky submit (client) */
   .sticky-submit {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
@@ -425,9 +451,15 @@
   .toast.success { background: var(--green); }
   .toast.error { background: var(--red); }
 
+  /* On mobile, push toast above the sticky bar */
+  @media (max-width: 640px) {
+    body:not(.client-mode) .toast { bottom: 80px; }
+  }
+
   /* ── PRINT ── */
   @media print {
-    .topbar, .clients-panel, .no-print { display: none !important; }
+    .topbar, .clients-panel, .no-print,
+    .mobile-utility-bar, .sitter-sticky-bar { display: none !important; }
     body { background: white; }
     .section, .res-section { break-inside: avoid; box-shadow: none; }
     .form-wrap { margin-top: 8px; }
@@ -438,15 +470,32 @@
 </head>
 <body>
 
+<!-- DESKTOP TOPBAR -->
 <div class="topbar">
   <div class="topbar-brand">🐾 <span>Meowtel</span> Intake Form</div>
-  <div class="topbar-actions" id="sitterActions">
+  <!-- Desktop sitter actions (hidden on mobile) -->
+  <div class="topbar-actions sitter-desktop" id="sitterActions">
     <button class="btn btn-ghost no-print" onclick="clearForm()">✕ New</button>
     <button class="btn btn-ghost no-print" onclick="window.print()">🖨 Print</button>
     <div class="topbar-divider no-print"></div>
     <button class="btn btn-ghost no-print" onclick="toggleClients()">📁 Saved Clients</button>
     <button class="btn btn-primary no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
     <button class="btn btn-hero no-print" onclick="saveAndGetLink()">🔗 Save &amp; Get Link</button>
+  </div>
+</div>
+
+<!-- MOBILE UTILITY BAR (utility actions, sitter only — shown below topbar on small screens) -->
+<div class="mobile-utility-bar no-print" id="mobileUtilityBar">
+  <button class="btn btn-ghost" onclick="clearForm()">✕ New</button>
+  <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+  <button class="btn btn-ghost" onclick="toggleClients()">📁 Saved Clients</button>
+</div>
+
+<!-- SITTER STICKY BOTTOM BAR (mobile only) -->
+<div class="sitter-sticky-bar no-print" id="sitterStickyBar">
+  <div class="sitter-sticky-bar-inner">
+    <button class="btn btn-primary" onclick="saveToSheets()">📊 Save to Sheets</button>
+    <button class="btn btn-hero" onclick="saveAndGetLink()">🔗 Save &amp; Get Link</button>
   </div>
 </div>
 
@@ -520,19 +569,18 @@
         </div>
       </div>
     </div>
-    <!-- Client-mode: compact pill display of res details -->
     <div class="res-pills" id="resPills"></div>
   </div>
 
   <div id="formBody"></div>
 </div>
 
-<!-- CLIENT SUBMIT BAR (shown in client mode only) -->
+<!-- CLIENT SUBMIT BAR -->
 <div class="client-submit-bar" id="clientSubmitBar" style="display:none">
   <button class="client-submit-btn" onclick="clientSubmit()" id="clientSubmitBtn">✅ Submit My Answers</button>
 </div>
 
-<!-- CLIENT CONFIRMATION SCREEN (shown after successful submission) -->
+<!-- CLIENT CONFIRMATION SCREEN -->
 <div id="clientConfirmation" style="display:none; max-width:900px; margin:0 auto 60px; padding:0 24px;">
   <div style="background:white; border:1px solid var(--border); border-radius:10px; padding:40px 32px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
     <div style="font-size:52px; margin-bottom:16px;">🐾</div>
@@ -555,7 +603,9 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div><script>
+<div class="toast" id="toast"></div>
+
+<script>
 const SECTIONS = [
   {
     title: "Access to the Home", subtitle: "Start here — most important",
@@ -683,7 +733,6 @@ function buildForm(clientMode = false) {
   const body = document.getElementById('formBody');
   body.innerHTML = '';
 
-  // Intro text for client mode — shown above section 1
   if (clientMode) {
     const intro = document.createElement('div');
     intro.className = 'client-intro';
@@ -721,14 +770,11 @@ function toggleSection(si) {
 }
 
 function nextSection(si) {
-  // Collapse current
   const cur = document.getElementById('section_' + si);
   if (cur) cur.classList.add('collapsed');
-  // Expand next
   const next = document.getElementById('section_' + (si + 1));
   if (next) {
     next.classList.remove('collapsed');
-    // Smooth scroll to it
     setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 }
@@ -757,7 +803,6 @@ function buildQ(item, si, qi) {
     ).join('')}</div>`;
   }
 
-  // Collapsible notes
   let notes = '';
   if (item.notes) {
     const notesId = `${id}_notes_area`;
@@ -770,7 +815,6 @@ function buildQ(item, si, qi) {
     </div>`;
   }
 
-  // Conditional wrapper attrs
   const condAttrs = item.showIf
     ? ` data-show-if-field="${item.showIf.field}" data-show-if-values="${item.showIf.values.join('|')}"`
     : '';
@@ -782,9 +826,7 @@ function toggleNotes(toggleId, areaId) {
   const toggle = document.getElementById(toggleId);
   const area = document.getElementById(areaId);
   const isOpen = area.classList.toggle('open');
-  // Hide the "Add details" button when open; show a "− Hide details" link inside the area
   toggle.style.display = isOpen ? 'none' : 'inline-flex';
-  // Add/remove the inline hide link inside the notes area
   let hideLink = area.querySelector('.q-notes-hide');
   if (isOpen) {
     if (!hideLink) {
@@ -803,12 +845,10 @@ function toggleNotes(toggleId, areaId) {
   }
 }
 
-// Field registry: field-id -> current value, used for conditional logic
 const FIELD_VALUES = {};
 
 function onFieldChange(fieldId, value) {
   FIELD_VALUES[fieldId] = value;
-  // Re-evaluate all conditional rows
   document.querySelectorAll('.q-row.conditional').forEach(row => {
     const triggerField = row.dataset.showIfField;
     const triggerValues = (row.dataset.showIfValues || '').split('|');
@@ -816,7 +856,6 @@ function onFieldChange(fieldId, value) {
       const shouldShow = triggerValues.includes(value);
       row.classList.toggle('visible', shouldShow);
       if (!shouldShow) {
-        // Clear inputs in hidden rows so they don't pollute saved data
         row.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
         row.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
         row.querySelectorAll('textarea').forEach(el => el.value = '');
@@ -825,15 +864,12 @@ function onFieldChange(fieldId, value) {
   });
 }
 
-// Call after loadAnswers to re-trigger conditional visibility
 function refreshConditionals() {
   Object.entries(FIELD_VALUES).forEach(([fieldId, value]) => {
     onFieldChange(fieldId, value);
   });
-  // Also scan current DOM values for any field with a data-field-id
   document.querySelectorAll('[data-field-id]').forEach(row => {
     const fieldId = row.dataset.fieldId;
-    // find the input inside it
     const sel = row.querySelector('select');
     const radio = row.querySelector('input[type=radio]:checked');
     const val = sel ? sel.value : (radio ? radio.value : '');
@@ -855,7 +891,6 @@ function loadAnswers(a) {
   document.querySelectorAll('.q-notes').forEach(el => {
     const val = a[`${el.dataset.s}_${el.dataset.q}_n`] || '';
     el.value = val;
-    // Auto-open the notes area if there's a saved value
     if (val) {
       const area = el.closest('.q-notes-area');
       const wrap = el.closest('.q-notes-wrap');
@@ -869,16 +904,17 @@ function loadAnswers(a) {
   document.querySelectorAll('.q-radio-group').forEach(g => {
     const v = a[`${g.dataset.s}_${g.dataset.q}`] || '';
     g.querySelectorAll('input').forEach(r => r.checked = r.value === v);
-    // Trigger field change for any field-id radios
     const row = g.closest('[data-field-id]');
     if (row && v) FIELD_VALUES[row.dataset.fieldId] = v;
   });
-  document.querySelectorAll('.q-check-group').forEach(g => { const vs = (a[`${g.dataset.s}_${g.dataset.q}`] || '').split(', ').filter(Boolean); g.querySelectorAll('input').forEach(c => c.checked = vs.includes(c.value)); });
+  document.querySelectorAll('.q-check-group').forEach(g => {
+    const vs = (a[`${g.dataset.s}_${g.dataset.q}`] || '').split(', ').filter(Boolean);
+    g.querySelectorAll('input').forEach(c => c.checked = vs.includes(c.value));
+  });
   document.querySelectorAll('select.q-select').forEach(el => {
     const row = el.closest('[data-field-id]');
     if (row && el.value) FIELD_VALUES[row.dataset.fieldId] = el.value;
   });
-  // Re-evaluate all conditional visibility after loading
   refreshConditionals();
 }
 
@@ -902,12 +938,40 @@ function setRes(r) {
   document.getElementById('lastName').value  = r.lastName  || '';
   document.getElementById('reservationNum').value = r.reservationNum || '';
   document.getElementById('catNames').value  = r.catNames  || '';
-  document.getElementById('dateStart').value = r.dateStart || '';
-  document.getElementById('dateEnd').value   = r.dateEnd   || '';
+  document.getElementById('dateStart').value = toDateInputValue(r.dateStart);
+  document.getElementById('dateEnd').value   = toDateInputValue(r.dateEnd);
   document.getElementById('addrStreet').value = r.addrStreet || '';
   document.getElementById('addrCity').value   = r.addrCity   || '';
   document.getElementById('addrState').value  = r.addrState  || '';
   document.getElementById('addrZip').value    = r.addrZip    || '';
+}
+
+/**
+ * BUG FIX: Normalise any date string into the YYYY-MM-DD format that
+ * <input type="date"> requires. Google Sheets can return dates in several
+ * formats (M/D/YYYY, D-Mon-YYYY, ISO, etc.) — this handles them all.
+ */
+function toDateInputValue(raw) {
+  if (!raw) return '';
+  const s = raw.toString().trim();
+  if (!s) return '';
+
+  // Already in YYYY-MM-DD format — return as-is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // Try parsing via Date constructor (handles most locale formats)
+  // Use noon UTC to avoid timezone-induced day-shift issues
+  const parsed = new Date(s);
+  if (!isNaN(parsed.getTime())) {
+    // getTime is valid; format as YYYY-MM-DD in LOCAL time
+    // (Sheets dates have no time component, so local is correct)
+    const y = parsed.getFullYear();
+    const m = String(parsed.getMonth() + 1).padStart(2, '0');
+    const d = String(parsed.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  return ''; // unparseable — leave blank
 }
 
 function validate() {
@@ -955,20 +1019,18 @@ async function fetchAndRenderClients() {
 
 function renderClientCards(rows, headers) {
   const container = document.getElementById('clientCards');
-  // Map header names to column indices
   const col = (name) => headers.indexOf(name);
-  const iFirst    = col('First Name');
-  const iLast     = col('Last Name');
-  const iResNum   = col('Reservation #');
-  const iCats     = col('Cat Name(s)');
-  const iStart    = col('Date Start');
-  const iEnd      = col('Date End');
-  const iUpdated  = col('Last Updated');
+  const iFirst   = col('First Name');
+  const iLast    = col('Last Name');
+  const iResNum  = col('Reservation #');
+  const iCats    = col('Cat Name(s)');
+  const iStart   = col('Date Start');
+  const iEnd     = col('Date End');
+  const iUpdated = col('Last Updated');
 
-  const sorted = [...rows].sort((a, b) => {
-    // Sort by Last Updated descending
-    return (b[iUpdated] || '') > (a[iUpdated] || '') ? 1 : -1;
-  });
+  const sorted = [...rows].sort((a, b) =>
+    (b[iUpdated] || '') > (a[iUpdated] || '') ? 1 : -1
+  );
 
   container.innerHTML = sorted.map((row, idx) => {
     const name  = `${row[iFirst]||''} ${row[iLast]||''}`.trim() || 'Unknown';
@@ -980,14 +1042,13 @@ function renderClientCards(rows, headers) {
     return `<div class="client-card">
       <div class="client-card-name">🐱 ${name}</div>
       <div class="client-card-meta">${dates}</div>
-      ${cats   ? `<div class="client-card-meta">Cats: ${cats}</div>`  : ''}
-      ${res    ? `<div class="client-card-meta">Res #${res}</div>`    : ''}
+      ${cats ? `<div class="client-card-meta">Cats: ${cats}</div>` : ''}
+      ${res  ? `<div class="client-card-meta">Res #${res}</div>`   : ''}
       <div class="client-card-actions">
         <button class="btn btn-gold btn-sm" onclick="loadClientFromSheets(${idx})">Load</button>
       </div></div>`;
   }).join('');
 
-  // Stash rows on container for loadClientFromSheets
   container._rows    = sorted;
   container._headers = headers;
 }
@@ -1001,21 +1062,20 @@ async function loadClientFromSheets(idx) {
   const row = rows[idx];
   const col = (name) => headers.indexOf(name);
 
-  // Rebuild res object from sheet columns
   const res = {
     firstName:      row[col('First Name')]    || '',
     lastName:       row[col('Last Name')]     || '',
     reservationNum: row[col('Reservation #')] || '',
     catNames:       row[col('Cat Name(s)')]   || '',
+    // BUG FIX: pass raw value through toDateInputValue (handled inside setRes)
     dateStart:      row[col('Date Start')]    || '',
     dateEnd:        row[col('Date End')]      || '',
-    addrStreet:     '',
-    addrCity:       '',
-    addrState:      '',
-    addrZip:        '',
+    addrStreet: '',
+    addrCity:   '',
+    addrState:  '',
+    addrZip:    '',
   };
 
-  // Parse address back out (stored as "Street, City, State, ZIP")
   const addr = row[col('Address')] || '';
   const parts = addr.split(',').map(s => s.trim());
   if (parts.length >= 1) res.addrStreet = parts[0];
@@ -1023,7 +1083,6 @@ async function loadClientFromSheets(idx) {
   if (parts.length >= 3) res.addrState  = parts[2];
   if (parts.length >= 4) res.addrZip    = parts[3];
 
-  // Rebuild answers object from remaining columns
   const answers = {};
   SECTIONS.forEach((sec, si) => {
     sec.questions.forEach((item, qi) => {
@@ -1044,7 +1103,13 @@ async function loadClientFromSheets(idx) {
   showToast(`Loaded: ${res.firstName} ${res.lastName}`, 'success');
 }
 
-function fmt(d) { return d ? new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''; }
+function fmt(d) {
+  if (!d) return '';
+  // Use toDateInputValue to normalize, then format for display
+  const iso = toDateInputValue(d.toString());
+  if (!iso) return '';
+  return new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwBuU8h9p18gFbQO62NmAr5w-vJYKWen5wbFLdReTqfCkzr2YQey5Ik6_l_ObLGdvjvKQ/exec';
 
@@ -1088,7 +1153,6 @@ async function saveAndGetLink() {
   try {
     await postToSheets(buildPayload());
     showToast(`✓ Saved. Generating link…`, 'success');
-    // Now show the link modal
     const encoded = btoa(JSON.stringify(res));
     const url = `${BASE_URL}?client=${encoded}`;
     document.getElementById('modalUrl').textContent = url;
@@ -1103,37 +1167,33 @@ async function saveAndGetLink() {
 
 const BASE_URL = 'https://brandonml.github.io/meowtel-client-questionaire/';
 
-// Detect whether the page was opened with a ?client= param
 function initMode() {
   const params = new URLSearchParams(window.location.search);
   const encoded = params.get('client');
-  if (!encoded) return; // sitter mode — nothing to do
+  if (!encoded) return;
 
-  // Decode and pre-fill reservation details
   try {
     const res = JSON.parse(atob(encoded));
-    // Rebuild form in client mode (collapsible, intro text, next buttons)
     buildForm(true);
     setRes(res);
-    // Lock all reservation fields so client can't edit them
+
     document.querySelectorAll('.res-input').forEach(el => el.setAttribute('readonly', true));
-    // Label locked fields
     document.querySelectorAll('.res-field label').forEach(el => {
       if (!el.querySelector('.res-readonly-badge')) {
         el.insertAdjacentHTML('beforeend', '<span class="res-readonly-badge">(pre-filled)</span>');
       }
     });
-    // Show client banner
+
     const name = `${res.firstName || ''} ${res.lastName || ''}`.trim();
     document.getElementById('clientNameTag').textContent = name ? `Hi, ${name}!` : '';
     document.getElementById('clientBanner').style.display = 'block';
-    // Update form title
     document.getElementById('formTitle').innerHTML = 'Your Cat Care <em>Questionnaire</em>';
-    // Swap topbar: hide sitter actions, show minimal client topbar
     document.getElementById('sitterActions').style.display = 'none';
-    // Hide saved clients panel entirely
     document.getElementById('clientsPanel').style.display = 'none';
-    // Check if this reservation was already submitted from this device
+    // Hide mobile sitter UI in client mode
+    document.getElementById('mobileUtilityBar').style.display = 'none';
+    document.getElementById('sitterStickyBar').style.display = 'none';
+
     const resNum = res.reservationNum || '';
     const storageKey = 'meowtel_submitted_' + resNum;
     if (resNum && localStorage.getItem(storageKey)) {
@@ -1141,10 +1201,8 @@ function initMode() {
       return;
     }
 
-    // Show sticky submit bar, hide the bottom bar version
     document.getElementById('stickySubmit').style.display = 'block';
     document.getElementById('clientSubmitBar').style.display = 'none';
-    // Add client-mode body class for padding
     document.body.classList.add('client-mode');
   } catch(e) {
     console.error('Invalid client param', e);
@@ -1152,18 +1210,13 @@ function initMode() {
 }
 
 function showConfirmationScreen() {
-  // Hide everything form-related
   document.getElementById('clientBanner').style.display = 'none';
   document.getElementById('clientSubmitBar').style.display = 'none';
   document.getElementById('stickySubmit').style.display = 'none';
   document.querySelector('.form-wrap').style.display = 'none';
-  // Show confirmation
   document.getElementById('clientConfirmation').style.display = 'block';
-  // Update topbar brand to a simple thank-you
   document.querySelector('.topbar-brand').innerHTML = '🐾 <span>Meowtel</span>';
 }
-
-// generateLink() merged into saveAndGetLink()
 
 function closeLinkModal() {
   document.getElementById('linkModal').style.display = 'none';
@@ -1175,7 +1228,6 @@ function copyLink() {
     showToast('Link copied to clipboard!', 'success');
     closeLinkModal();
   }).catch(() => {
-    // Fallback for older mobile browsers
     const el = document.createElement('textarea');
     el.value = url; document.body.appendChild(el);
     el.select(); document.execCommand('copy');
@@ -1188,7 +1240,8 @@ function copyLink() {
 async function clientSubmit() {
   const btn = document.getElementById('clientSubmitBtn');
   const stickyBtn = document.getElementById('stickySubmitBtn');
-  btn.disabled = true; if(stickyBtn) { stickyBtn.disabled = true; stickyBtn.textContent = 'Submitting…'; }
+  btn.disabled = true;
+  if (stickyBtn) { stickyBtn.disabled = true; stickyBtn.textContent = 'Submitting…'; }
   btn.textContent = 'Submitting…';
 
   const res = getRes();
@@ -1205,13 +1258,12 @@ async function clientSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    // Mark submission in localStorage (prevents re-submission on same device)
     const resNum = (res.reservationNum || '').toString().trim();
     if (resNum) localStorage.setItem('meowtel_submitted_' + resNum, '1');
     showConfirmationScreen();
   } catch(err) {
-     btn.disabled = false;
-    if(stickyBtn) { stickyBtn.disabled = false; stickyBtn.textContent = '✅ Submit My Answers'; }
+    btn.disabled = false;
+    if (stickyBtn) { stickyBtn.disabled = false; stickyBtn.textContent = '✅ Submit My Answers'; }
     btn.textContent = '✅ Submit My Answers';
     showToast('Submission failed — please check your connection and try again.', 'error');
     console.error(err);
@@ -1220,11 +1272,11 @@ async function clientSubmit() {
 
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show' + (type ? ' '+type : '');
+  t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : '');
   setTimeout(() => t.className = 'toast', 2800);
 }
 
-buildForm(); // sitter mode — initMode may rebuild with clientMode=true
+buildForm();
 initMode();
 </script>
 </body>
