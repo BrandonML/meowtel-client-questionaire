@@ -143,12 +143,11 @@
 
   /* COLLAPSIBLE NOTES TOGGLE */
   .q-notes-wrap { margin-top: 6px; }
-  .q-notes-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; border: none; background: none; padding: 2px 0; font-family: 'DM Sans', sans-serif; transition: color 0.15s; }
+  .q-notes-toggle { display: inline-flex; align-items: center; font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; border: none; background: none; padding: 2px 0; font-family: 'DM Sans', sans-serif; transition: color 0.15s; }
   .q-notes-toggle:hover { color: var(--rust); }
-  .q-notes-toggle .toggle-icon { font-size: 10px; transition: transform 0.2s; display: inline-block; }
-  .q-notes-toggle.open .toggle-icon { transform: rotate(90deg); }
   .q-notes-area { display: none; margin-top: 5px; }
   .q-notes-area.open { display: block; }
+  .q-notes-hide { margin-bottom: 4px; }
 
   /* CONDITIONAL FIELDS */
   .q-row.conditional { display: none; }
@@ -505,9 +504,7 @@ function buildQ(item, si, qi) {
     const notesId = `${id}_notes_area`;
     const toggleId = `${id}_toggle`;
     notes = `<div class="q-notes-wrap">
-      <button type="button" class="q-notes-toggle" id="${toggleId}" onclick="toggleNotes('${toggleId}','${notesId}')">
-        <span class="toggle-icon">▶</span> Add details
-      </button>
+      <button type="button" class="q-notes-toggle" id="${toggleId}" onclick="toggleNotes('${toggleId}','${notesId}')">+ Add details</button>
       <div class="q-notes-area" id="${notesId}">
         <textarea class="q-notes" id="${id}_notes" data-s="${si}" data-q="${qi}" data-notes="1" placeholder="${item.notes}"></textarea>
       </div>
@@ -526,17 +523,24 @@ function toggleNotes(toggleId, areaId) {
   const toggle = document.getElementById(toggleId);
   const area = document.getElementById(areaId);
   const isOpen = area.classList.toggle('open');
-  toggle.classList.toggle('open', isOpen);
-  toggle.querySelector('.toggle-icon').style.transform = isOpen ? 'rotate(90deg)' : '';
+  // Hide the "Add details" button when open; show a "− Hide details" link inside the area
+  toggle.style.display = isOpen ? 'none' : 'inline-flex';
+  // Add/remove the inline hide link inside the notes area
+  let hideLink = area.querySelector('.q-notes-hide');
   if (isOpen) {
+    if (!hideLink) {
+      hideLink = document.createElement('button');
+      hideLink.type = 'button';
+      hideLink.className = 'q-notes-toggle q-notes-hide';
+      hideLink.textContent = '− Hide details';
+      hideLink.onclick = () => toggleNotes(toggleId, areaId);
+      area.insertBefore(hideLink, area.firstChild);
+    }
+    hideLink.style.display = 'inline-flex';
     const txt = area.querySelector('textarea');
     if (txt) txt.focus();
-    // Update label
-    const label = toggle.childNodes[1];
-    if (label) label.textContent = ' Hide details';
   } else {
-    const label = toggle.childNodes[1];
-    if (label) label.textContent = ' Add details';
+    if (hideLink) hideLink.style.display = 'none';
   }
 }
 
@@ -596,16 +600,10 @@ function loadAnswers(a) {
     if (val) {
       const area = el.closest('.q-notes-area');
       const wrap = el.closest('.q-notes-wrap');
-      if (area) area.classList.add('open');
-      if (wrap) {
-        const toggle = wrap.querySelector('.q-notes-toggle');
-        if (toggle) {
-          toggle.classList.add('open');
-          const icon = toggle.querySelector('.toggle-icon');
-          if (icon) icon.style.transform = 'rotate(90deg)';
-          const label = toggle.childNodes[1];
-          if (label) label.textContent = ' Hide details';
-        }
+      if (area && wrap) {
+        const toggleId = wrap.querySelector('.q-notes-toggle')?.id;
+        const areaId = area.id;
+        if (toggleId && areaId) toggleNotes(toggleId, areaId);
       }
     }
   });
