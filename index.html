@@ -13,7 +13,6 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
-  .d-none { display: none !important; }
 
   /* TOP BAR */
   .topbar {
@@ -187,9 +186,8 @@
     <button class="btn btn-outline no-print" onclick="toggleClients()">📁 Saved Clients</button>
     <button class="btn btn-outline no-print" onclick="clearForm()">✕ New Form</button>
     <button class="btn btn-outline no-print" onclick="window.print()">🖨 Print</button>
-    <button class="btn btn-outline no-print" onclick="generateLink()">🔗 Client Link</button>
-    <button class="btn btn-primary no-print d-none" onclick="saveLocal()">💾 Save Local</button>
-    <button class="btn btn-gold no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
+    <button class="btn btn-primary no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
+    <button class="btn btn-gold no-print" onclick="saveAndGetLink()">🔗 Save &amp; Get Link</button>
   </div>
 </div>
 
@@ -659,89 +657,183 @@ function validate() {
   return ok;
 }
 
-function saveLocal(silent = false) {
-  if (!validate()) return false;
-  const res = getRes();
-  const id = `${res.firstName}_${res.lastName}_${Date.now()}`.toLowerCase().replace(/\s+/g,'_');
-  const clients = getClients();
-  clients[id] = { id, res, answers: getAnswers(), saved: new Date().toISOString() };
-  localStorage.setItem('meowtel_clients', JSON.stringify(clients));
-  renderClientCards();
-  if (!silent) showToast(`Saved: ${res.firstName} ${res.lastName}`, 'success');
-  return true;
-}
-
-function getClients() { try { return JSON.parse(localStorage.getItem('meowtel_clients') || '{}'); } catch { return {}; } }
-
-function loadClient(id) {
-  const c = getClients()[id]; if (!c) return;
-  setRes(c.res || {}); loadAnswers(c.answers || {});
-  toggleClients();
-  showToast(`Loaded: ${c.res.firstName} ${c.res.lastName}`, 'success');
-}
-
-function deleteClient(id) {
-  const clients = getClients();
-  const n = clients[id]?.res ? `${clients[id].res.firstName} ${clients[id].res.lastName}` : 'Client';
-  delete clients[id];
-  localStorage.setItem('meowtel_clients', JSON.stringify(clients));
-  renderClientCards(); showToast(`Deleted: ${n}`);
-}
-
 function clearForm() {
   setRes({});
   document.querySelectorAll('.q-text,.q-select,.q-notes').forEach(el => el.value = '');
   document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el => el.checked = false);
   document.querySelectorAll('.res-input').forEach(el => el.classList.remove('invalid'));
+  Object.keys(FIELD_VALUES).forEach(k => delete FIELD_VALUES[k]);
+  document.querySelectorAll('.q-row.conditional').forEach(r => r.classList.remove('visible'));
   showToast('Form cleared — ready for new client');
 }
 
 function toggleClients() {
   const p = document.getElementById('clientsPanel');
   p.classList.toggle('open');
-  if (p.classList.contains('open')) renderClientCards();
+  if (p.classList.contains('open')) fetchAndRenderClients();
 }
 
-function renderClientCards() {
+// ── SHEETS-DRIVEN CLIENT LIST ──
+
+async function fetchAndRenderClients() {
   const container = document.getElementById('clientCards');
-  const list = Object.values(getClients()).sort((a,b) => b.saved > a.saved ? 1 : -1);
-  if (!list.length) { container.innerHTML = '<p class="empty-state">No clients saved yet.</p>'; return; }
-  container.innerHTML = list.map(c => {
-    const r = c.res || {};
-    const name = `${r.firstName||''} ${r.lastName||''}`.trim() || 'Unknown';
-    const dates = r.dateStart ? `${fmt(r.dateStart)}${r.dateEnd ? ' – '+fmt(r.dateEnd) : ''}` : 'No dates';
+  container.innerHTML = '<p class="empty-state">Loading from Google Sheets…</p>';
+  try {
+    const resp = await fetch(SHEETS_URL + '?action=list');
+    const data = await resp.json();
+    if (!data.rows || !data.rows.length) {
+      container.innerHTML = '<p class="empty-state">No clients found in Google Sheets.</p>';
+      return;
+    }
+    renderClientCards(data.rows, data.headers);
+  } catch(err) {
+    container.innerHTML = '<p class="empty-state">Could not load from Sheets — check connection.</p>';
+    console.error(err);
+  }
+}
+
+function renderClientCards(rows, headers) {
+  const container = document.getElementById('clientCards');
+  // Map header names to column indices
+  const col = (name) => headers.indexOf(name);
+  const iFirst    = col('First Name');
+  const iLast     = col('Last Name');
+  const iResNum   = col('Reservation #');
+  const iCats     = col('Cat Name(s)');
+  const iStart    = col('Date Start');
+  const iEnd      = col('Date End');
+  const iUpdated  = col('Last Updated');
+
+  const sorted = [...rows].sort((a, b) => {
+    // Sort by Last Updated descending
+    return (b[iUpdated] || '') > (a[iUpdated] || '') ? 1 : -1;
+  });
+
+  container.innerHTML = sorted.map((row, idx) => {
+    const name  = `${row[iFirst]||''} ${row[iLast]||''}`.trim() || 'Unknown';
+    const res   = row[iResNum] || '';
+    const cats  = row[iCats]  || '';
+    const start = row[iStart] ? fmt(row[iStart]) : '';
+    const end   = row[iEnd]   ? fmt(row[iEnd])   : '';
+    const dates = start ? (end ? `${start} – ${end}` : start) : 'No dates';
     return `<div class="client-card">
       <div class="client-card-name">🐱 ${name}</div>
       <div class="client-card-meta">${dates}</div>
-      ${r.catNames ? `<div class="client-card-meta">Cats: ${r.catNames}</div>` : ''}
-      ${r.reservationNum ? `<div class="client-card-meta">Res #${r.reservationNum}</div>` : ''}
+      ${cats   ? `<div class="client-card-meta">Cats: ${cats}</div>`  : ''}
+      ${res    ? `<div class="client-card-meta">Res #${res}</div>`    : ''}
       <div class="client-card-actions">
-        <button class="btn btn-gold btn-sm" onclick="loadClient('${c.id}')">Load</button>
-        <button class="btn btn-outline btn-sm" style="color:#c00;border-color:#c00" onclick="deleteClient('${c.id}')">Delete</button>
+        <button class="btn btn-gold btn-sm" onclick="loadClientFromSheets(${idx})">Load</button>
       </div></div>`;
   }).join('');
+
+  // Stash rows on container for loadClientFromSheets
+  container._rows    = sorted;
+  container._headers = headers;
+}
+
+async function loadClientFromSheets(idx) {
+  const container = document.getElementById('clientCards');
+  const rows    = container._rows;
+  const headers = container._headers;
+  if (!rows || !rows[idx]) return;
+
+  const row = rows[idx];
+  const col = (name) => headers.indexOf(name);
+
+  // Rebuild res object from sheet columns
+  const res = {
+    firstName:      row[col('First Name')]    || '',
+    lastName:       row[col('Last Name')]     || '',
+    reservationNum: row[col('Reservation #')] || '',
+    catNames:       row[col('Cat Name(s)')]   || '',
+    dateStart:      row[col('Date Start')]    || '',
+    dateEnd:        row[col('Date End')]      || '',
+    addrStreet:     '',
+    addrCity:       '',
+    addrState:      '',
+    addrZip:        '',
+  };
+
+  // Parse address back out (stored as "Street, City, State, ZIP")
+  const addr = row[col('Address')] || '';
+  const parts = addr.split(',').map(s => s.trim());
+  if (parts.length >= 1) res.addrStreet = parts[0];
+  if (parts.length >= 2) res.addrCity   = parts[1];
+  if (parts.length >= 3) res.addrState  = parts[2];
+  if (parts.length >= 4) res.addrZip    = parts[3];
+
+  // Rebuild answers object from remaining columns
+  const answers = {};
+  SECTIONS.forEach((sec, si) => {
+    sec.questions.forEach((item, qi) => {
+      const colName = `[${sec.title}] ${item.q}`;
+      const val = row[col(colName)];
+      if (val !== undefined) answers[`${si}_${qi}`] = val;
+      if (item.notes) {
+        const notesCol = `[${sec.title}] ${item.q} — notes`;
+        const nval = row[col(notesCol)];
+        if (nval !== undefined) answers[`${si}_${qi}_n`] = nval;
+      }
+    });
+  });
+
+  setRes(res);
+  loadAnswers(answers);
+  toggleClients();
+  showToast(`Loaded: ${res.firstName} ${res.lastName}`, 'success');
 }
 
 function fmt(d) { return d ? new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''; }
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwBuU8h9p18gFbQO62NmAr5w-vJYKWen5wbFLdReTqfCkzr2YQey5Ik6_l_ObLGdvjvKQ/exec';
 
-async function saveToSheets() {
-  if (!validate()) return;
+function buildPayload() {
   const res = getRes();
-  showToast('Sending to Google Sheets…');
-  const payload = {
+  return {
     ...res,
     clientName: `${res.firstName} ${res.lastName}`,
     answers: getAnswers(),
     sections: SECTIONS.map(s => ({ title: s.title, questions: s.questions.map(q => ({ q: q.q, notes: q.notes || null })) }))
   };
+}
+
+async function postToSheets(payload) {
+  await fetch(SHEETS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function saveToSheets() {
+  if (!validate()) return false;
+  const res = getRes();
+  showToast('Saving to Google Sheets…');
   try {
-    await fetch(SHEETS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    showToast(`✓ Saved to Sheets: ${res.firstName} ${res.lastName}`, 'success');
-    saveLocal(true);
+    await postToSheets(buildPayload());
+    showToast(`✓ Saved: ${res.firstName} ${res.lastName}`, 'success');
+    return true;
   } catch(err) {
     showToast('Failed — check connection and try again.', 'error');
+    console.error(err);
+    return false;
+  }
+}
+
+async function saveAndGetLink() {
+  if (!validate()) return;
+  const res = getRes();
+  showToast('Saving to Google Sheets…');
+  try {
+    await postToSheets(buildPayload());
+    showToast(`✓ Saved. Generating link…`, 'success');
+    // Now show the link modal
+    const encoded = btoa(JSON.stringify(res));
+    const url = `${BASE_URL}?client=${encoded}`;
+    document.getElementById('modalUrl').textContent = url;
+    document.getElementById('linkModal').style.display = 'flex';
+  } catch(err) {
+    showToast('Save failed — link not generated. Check connection.', 'error');
     console.error(err);
   }
 }
@@ -810,14 +902,7 @@ function showConfirmationScreen() {
   document.querySelector('.topbar-brand').innerHTML = '🐾 <span>Meowtel</span>';
 }
 
-function generateLink() {
-  if (!validate()) return;
-  const res = getRes();
-  const encoded = btoa(JSON.stringify(res));
-  const url = `${BASE_URL}?client=${encoded}`;
-  document.getElementById('modalUrl').textContent = url;
-  document.getElementById('linkModal').style.display = 'flex';
-}
+// generateLink() merged into saveAndGetLink()
 
 function closeLinkModal() {
   document.getElementById('linkModal').style.display = 'none';
@@ -859,10 +944,9 @@ async function clientSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    // Mark this reservation as submitted in localStorage
+    // Mark submission in localStorage (prevents re-submission on same device)
     const resNum = (res.reservationNum || '').toString().trim();
     if (resNum) localStorage.setItem('meowtel_submitted_' + resNum, '1');
-    // Swap to confirmation screen
     showConfirmationScreen();
   } catch(err) {
      btn.disabled = false;

@@ -43,21 +43,40 @@ function doPost(e) {
     // Keep the first several meta columns readable
     sheet.autoResizeColumns(1, 8);
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: true, action: existingRow > 0 ? 'updated' : 'inserted' }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ success: true, action: existingRow > 0 ? 'updated' : 'inserted' });
 
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ success: false, error: err.message });
   }
 }
 
-// Handles browser preflight / health check
+// Handles GET requests:
+//   ?action=list  → returns all sheet rows as JSON for the Saved Clients panel
+//   (no params)   → health check
 function doGet(e) {
+  var action = e && e.parameter && e.parameter.action;
+
+  if (action === 'list') {
+    var sheet   = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var lastRow = sheet.getLastRow();
+
+    if (lastRow < 2) {
+      return jsonResponse({ headers: [], rows: [] });
+    }
+
+    var lastCol  = sheet.getLastColumn();
+    var headers  = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    var rowData  = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+    return jsonResponse({ headers: headers, rows: rowData });
+  }
+
+  return jsonResponse({ status: 'ok' });
+}
+
+function jsonResponse(obj) {
   return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok' }))
+    .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
