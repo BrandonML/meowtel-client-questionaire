@@ -140,6 +140,19 @@
   .btn-blue { background: #1a3a5c; color: white; }
   .btn-blue:hover { background: #2a5a8c; }
 
+  /* COLLAPSIBLE NOTES TOGGLE */
+  .q-notes-wrap { margin-top: 6px; }
+  .q-notes-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); cursor: pointer; user-select: none; border: none; background: none; padding: 2px 0; font-family: 'DM Sans', sans-serif; transition: color 0.15s; }
+  .q-notes-toggle:hover { color: var(--rust); }
+  .q-notes-toggle .toggle-icon { font-size: 10px; transition: transform 0.2s; display: inline-block; }
+  .q-notes-toggle.open .toggle-icon { transform: rotate(90deg); }
+  .q-notes-area { display: none; margin-top: 5px; }
+  .q-notes-area.open { display: block; }
+
+  /* CONDITIONAL FIELDS */
+  .q-row.conditional { display: none; }
+  .q-row.conditional.visible { display: flex; }
+
   /* COLLAPSIBLE SECTIONS (client mode) */
   .section.collapsible .section-header { cursor: pointer; user-select: none; }
   .section.collapsible .section-header:hover { background: #2a2010; }
@@ -288,93 +301,113 @@ const SECTIONS = [
   {
     title: "Access to the Home", subtitle: "Start here — most important",
     questions: [
-      { q: "How will I access the home?", type: "select", options: ["Key", "Keypad / Door code", "Lockbox", "Concierge / Front desk", "Garage code", "Other"], notes: "Access details, codes, or location of key/lockbox" },
-      { q: "If using a key, where should I keep it during the booking?", type: "textarea" },
-      { q: "After the final visit, where should I leave the key?", type: "textarea" },
-      { q: "Is there a backup way to enter if the primary method fails?", type: "radio", options: ["Yes", "No"], notes: "Describe backup entry method" },
-      { q: "Is there a security system or alarm?", type: "radio", options: ["Yes", "No"], notes: "Arm/disarm instructions and code" },
-      { q: "Should I lock doors and windows when I leave?", type: "radio", options: ["Yes — all", "Doors only", "No"], notes: "Any exceptions or specifics" },
+      { q: "How will I access the home?", type: "select", id: "access_type",
+        options: ["Key", "Keypad / Door code", "Lockbox", "Concierge / Front desk", "Garage code", "Other"],
+        notes: "Access details, codes, or location of key/lockbox" },
+      { q: "After the final visit, where should I leave the key?", type: "textarea",
+        showIf: { field: "access_type", values: ["Key", "Other"] } },
+      { q: "Is there a backup way to enter if the primary method fails?", type: "radio",
+        options: ["Yes", "No"], notes: "Describe backup entry method" },
+      { q: "Is there a security system or alarm?", type: "radio",
+        options: ["Yes", "No"], notes: "Arm/disarm instructions and code" },
     ]
   },
   {
     title: "Visit Timing", subtitle: "Clarify expectations upfront",
     questions: [
-      { q: "Do you have a preferred time within the scheduled slot?", type: "radio", options: ["Any time is fine", "Prefer earlier in window", "Prefer later in window", "Specific time preferred"], notes: "Preferred time or notes" },
-      { q: "Do the cats expect food at specific times, or are they flexible?", type: "radio", options: ["Specific times required", "Flexible"], notes: "Feeding time details" },
-      { q: "Is it okay if my visit times vary slightly day to day?", type: "radio", options: ["Yes, that's fine", "No — please be consistent"] },
+      { q: "Do you have a preferred time within the scheduled slot?", type: "radio",
+        options: ["Any time is fine", "Prefer earlier in window", "Prefer later in window", "Specific time preferred"],
+        notes: "Preferred time or notes" },
+      { q: "Do the cats expect food at specific times, or are they flexible?", type: "radio",
+        options: ["Specific times required", "Flexible"], notes: "Feeding time details" },
     ]
   },
   {
     title: "Feeding", subtitle: "Where mistakes usually happen",
     questions: [
       { q: "Where is the cat food located?", type: "textarea" },
-      { q: "How much should each cat get per feeding?", type: "textarea" },
-      { q: "Food type", type: "radio", options: ["Wet only", "Dry only", "Both wet & dry"], notes: "Brand, flavor, or prep notes" },
-      { q: "Do they eat separately or share bowls?", type: "radio", options: ["Share bowls", "Eat separately", "Separate but side by side"], notes: "Any feeding setup details" },
-      { q: "Are there treats?", type: "radio", options: ["Yes", "No"], notes: "Type of treat and how often" },
-      { q: "Are there any foods they cannot have?", type: "radio", options: ["Yes", "No"], notes: "List restricted foods" },
-    ]
-  },
-  {
-    title: "Water", subtitle: "Often overlooked",
-    questions: [
       { q: "Where are the water bowls or fountains?", type: "textarea" },
-      { q: "Should I refresh the water each visit?", type: "radio", options: ["Yes", "Only if low", "No"] },
-      { q: "Any water preferences?", type: "radio", options: ["Tap is fine", "Filtered only", "No preference"], notes: "Specifics" },
+      { q: "How much should each cat get per feeding?", type: "textarea" },
+      { q: "Food type", type: "radio", options: ["Wet only", "Dry only", "Both wet & dry"],
+        notes: "Brand, flavor, or prep notes" },
+      { q: "Do they eat separately or share bowls?", type: "radio",
+        options: ["Share bowls", "Eat separately", "Separate but side by side"],
+        notes: "Any feeding setup details" },
+      { q: "Are there treats?", type: "radio", options: ["Yes", "No"],
+        notes: "Type of treat and how often" },
+      { q: "Are there any foods they cannot have?", type: "radio", options: ["Yes", "No"],
+        notes: "List restricted foods" },
     ]
   },
   {
     title: "Litter Box", subtitle: "Critical for cats",
     questions: [
       { q: "Where are the litter boxes located?", type: "textarea" },
-      { q: "How often should they be scooped?", type: "select", options: ["Every visit", "Once daily", "Every other day", "As needed"] },
+      { q: "How often should they be scooped?", type: "select",
+        options: ["Every visit", "Once daily", "Every other day", "As needed"] },
       { q: "Where are the scooper, litter, and trash bags?", type: "textarea" },
       { q: "Where should I dispose of waste?", type: "textarea" },
-      { q: "Do any cats have litter box issues to watch for?", type: "radio", options: ["Yes", "No"], notes: "Describe issues" },
+      { q: "Do any cats have litter box issues to watch for?", type: "radio",
+        options: ["Yes", "No"], notes: "Describe issues" },
     ]
   },
   {
     title: "Cat Behavior & Personality", subtitle: "Avoid surprises",
     questions: [
-      { q: "General temperament (select all that apply)", type: "checkbox", options: ["Friendly & social", "Shy at first", "Cautious with strangers", "Playful", "Independent", "Affectionate", "Anxious / skittish"] },
-      { q: "Do they usually hide when someone new comes in?", type: "radio", options: ["Yes — expect hiding", "Sometimes", "Rarely / No"] },
-      { q: "Activities they enjoy (select all that apply)", type: "checkbox", options: ["Interactive play", "Wand toys", "Laser pointer", "Brushing", "Lap time", "Not really into interaction"] },
-      { q: "Any behaviors I should know about?", type: "textarea", placeholder: "e.g. door darting, counter surfing, aggression triggers, hiding spots…" },
+      { q: "General temperament (select all that apply)", type: "checkbox",
+        options: ["Friendly & social", "Shy at first", "Cautious with strangers", "Playful", "Independent", "Affectionate", "Anxious / skittish"] },
+      { q: "Do they usually hide when someone new comes in?", type: "radio",
+        options: ["Yes — expect hiding", "Sometimes", "Rarely / No"] },
+      { q: "Activities they enjoy (select all that apply)", type: "checkbox",
+        options: ["Interactive play", "Wand toys", "Laser pointer", "Brushing", "Lap time", "Not really into interaction"] },
+      { q: "Any behaviors I should know about?", type: "textarea",
+        placeholder: "e.g. door darting, counter surfing, aggression triggers, hiding spots…" },
     ]
   },
   {
     title: "Health & Emergencies", subtitle: "Cover this completely",
     questions: [
-      { q: "Any medical issues or ongoing conditions?", type: "radio", options: ["Yes", "No"], notes: "Describe conditions" },
-      { q: "Any medications required?", type: "radio", options: ["Yes", "No"], notes: "Medication name, dosage, timing, and how to administer" },
-      { q: "How is medication given?", type: "radio", options: ["N/A", "Pill in food", "Pill directly", "Liquid in food", "Liquid directly", "Topical", "Other"], notes: "Tips for giving meds successfully" },
-      { q: "Emergency vet contact", type: "textarea", placeholder: "Name, phone number, address" },
-      { q: "Backup contact if I can't reach you", type: "textarea", placeholder: "Name, relationship, phone number" },
+      { q: "Any medical issues or ongoing conditions?", type: "radio", id: "has_medical",
+        options: ["Yes", "No"], notes: "Describe conditions" },
+      { q: "Any medications required?", type: "radio", id: "has_meds",
+        options: ["Yes", "No"], notes: "Medication name, dosage, timing, and how to administer",
+        showIf: { field: "has_medical", values: ["Yes"] } },
+      { q: "How is medication given?", type: "radio",
+        options: ["Pill in food", "Pill directly", "Liquid in food", "Liquid directly", "Topical", "Other"],
+        notes: "Tips for giving meds successfully",
+        showIf: { field: "has_medical", values: ["Yes"] } },
       { q: "What should I do if a cat refuses food or seems sick?", type: "textarea" },
     ]
   },
   {
     title: "Photos & Updates", subtitle: "Owners care a lot about this",
     questions: [
-      { q: "Would you like photos or videos during visits?", type: "radio", options: ["Photos please", "Videos too", "Either is fine", "Not necessary"] },
-      { q: "How often would you like updates?", type: "select", options: ["Every visit", "Once daily", "Every other day", "Only if something notable happens"] },
-      { q: "Preferred communication method", type: "radio", options: ["Meowtel app", "Text message", "Either is fine"] },
+      { q: "Would you like photos or videos during visits?", type: "radio",
+        options: ["Photos please", "Videos too", "Either is fine", "Not necessary"] },
+      { q: "How often would you like updates?", type: "select",
+        options: ["Every visit", "Once daily", "Every other day", "Only if something notable happens"] },
+      { q: "Preferred communication method", type: "radio",
+        options: ["Meowtel app", "Text message", "Either is fine"] },
     ]
   },
   {
     title: "House Rules", subtitle: "Avoid awkward misunderstandings",
     questions: [
-      { q: "Should I bring in mail or packages?", type: "radio", options: ["Yes", "Packages only", "No"] },
-      { q: "Should I water any plants?", type: "radio", options: ["Yes", "No"], notes: "Which plants, how much, and how often" },
-      { q: "Are there rooms the cats shouldn't enter?", type: "radio", options: ["Yes", "No"], notes: "Which rooms and why" },
-      { q: "Lights when I leave", type: "radio", options: ["Leave on", "Turn off", "Leave as-is", "Use timer / smart lights"] },
-      { q: "Is the thermostat okay to adjust if needed?", type: "radio", options: ["Yes", "No — please leave it", "Yes, within a range"], notes: "Acceptable range or target temp" },
+      { q: "Should I bring in mail or packages?", type: "radio",
+        options: ["Yes", "Packages only", "No"] },
+      { q: "Should I water any plants?", type: "radio", options: ["Yes", "No"],
+        notes: "Which plants, how much, and how often" },
+      { q: "Are there rooms the cats shouldn't enter?", type: "radio", options: ["Yes", "No"],
+        notes: "Which rooms and why" },
+      { q: "Lights when I leave", type: "radio",
+        options: ["Leave on", "Turn off", "Leave as-is", "Use timer / smart lights"] },
     ]
   },
   {
     title: "Supplies", subtitle: "Avoid running out",
     questions: [
-      { q: "Is there extra food and litter available?", type: "radio", options: ["Yes", "Contact me if running low"], notes: "Where extras are stored" },
+      { q: "Is there extra food and litter available?", type: "radio",
+        options: ["Yes", "Contact me if running low"], notes: "Where extras are stored" },
       { q: "Where are cleaning supplies if a cat has an accident?", type: "textarea" },
       { q: "Where are paper towels and trash bags?", type: "textarea" },
     ]
@@ -383,7 +416,6 @@ const SECTIONS = [
     title: "End of Booking", subtitle: "Clarify final expectations",
     questions: [
       { q: "On the final visit, anything special you'd like done?", type: "textarea" },
-      { q: "Should I send a final update before you return?", type: "radio", options: ["Yes please", "No need"] },
     ]
   }
 ];
@@ -444,19 +476,105 @@ function nextSection(si) {
 
 function buildQ(item, si, qi) {
   const id = `q_${si}_${qi}`;
+  const fieldId = item.id || null;
+  const dataId = fieldId ? ` data-field-id="${fieldId}"` : '';
+  const isConditional = item.showIf ? ' conditional' : '';
+
   let inp = '';
   if (item.type === 'textarea') {
     inp = `<textarea class="q-text${(item.placeholder || '').length > 40 ? ' tall' : ''}" id="${id}" data-s="${si}" data-q="${qi}" placeholder="${item.placeholder || ''}"></textarea>`;
   } else if (item.type === 'select') {
-    inp = `<select class="q-select" id="${id}" data-s="${si}" data-q="${qi}"><option value="">— select —</option>${item.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+    const onchange = fieldId ? ` onchange="onFieldChange('${fieldId}', this.value)"` : '';
+    inp = `<select class="q-select" id="${id}" data-s="${si}" data-q="${qi}"${onchange}><option value="">— select —</option>${item.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
   } else if (item.type === 'radio') {
     const n = `r_${si}_${qi}`;
-    inp = `<div class="q-radio-group" id="${id}" data-s="${si}" data-q="${qi}">${item.options.map(o => `<label><input type="radio" name="${n}" value="${o}"><span>${o}</span></label>`).join('')}</div>`;
+    const onchange = fieldId ? ` onchange="onFieldChange('${fieldId}', this.value)"` : '';
+    inp = `<div class="q-radio-group" id="${id}" data-s="${si}" data-q="${qi}">${item.options.map(o =>
+      `<label><input type="radio" name="${n}" value="${o}"${onchange}><span>${o}</span></label>`
+    ).join('')}</div>`;
   } else if (item.type === 'checkbox') {
-    inp = `<div class="q-check-group" id="${id}" data-s="${si}" data-q="${qi}">${item.options.map(o => `<label><input type="checkbox" value="${o}"><span>${o}</span></label>`).join('')}</div>`;
+    inp = `<div class="q-check-group" id="${id}" data-s="${si}" data-q="${qi}">${item.options.map(o =>
+      `<label><input type="checkbox" value="${o}"><span>${o}</span></label>`
+    ).join('')}</div>`;
   }
-  const notes = item.notes ? `<div class="q-notes-wrap"><div class="q-notes-label">📝 ${item.notes}</div><textarea class="q-notes" id="${id}_notes" data-s="${si}" data-q="${qi}" data-notes="1"></textarea></div>` : '';
-  return `<div class="q-row"><div class="q-label"><span class="q-mark">›</span>${item.q}</div>${inp}${notes}</div>`;
+
+  // Collapsible notes
+  let notes = '';
+  if (item.notes) {
+    const notesId = `${id}_notes_area`;
+    const toggleId = `${id}_toggle`;
+    notes = `<div class="q-notes-wrap">
+      <button type="button" class="q-notes-toggle" id="${toggleId}" onclick="toggleNotes('${toggleId}','${notesId}')">
+        <span class="toggle-icon">▶</span> Add details
+      </button>
+      <div class="q-notes-area" id="${notesId}">
+        <textarea class="q-notes" id="${id}_notes" data-s="${si}" data-q="${qi}" data-notes="1" placeholder="${item.notes}"></textarea>
+      </div>
+    </div>`;
+  }
+
+  // Conditional wrapper attrs
+  const condAttrs = item.showIf
+    ? ` data-show-if-field="${item.showIf.field}" data-show-if-values="${item.showIf.values.join('|')}"`
+    : '';
+
+  return `<div class="q-row${isConditional}"${dataId}${condAttrs}><div class="q-label"><span class="q-mark">›</span>${item.q}</div>${inp}${notes}</div>`;
+}
+
+function toggleNotes(toggleId, areaId) {
+  const toggle = document.getElementById(toggleId);
+  const area = document.getElementById(areaId);
+  const isOpen = area.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
+  toggle.querySelector('.toggle-icon').style.transform = isOpen ? 'rotate(90deg)' : '';
+  if (isOpen) {
+    const txt = area.querySelector('textarea');
+    if (txt) txt.focus();
+    // Update label
+    const label = toggle.childNodes[1];
+    if (label) label.textContent = ' Hide details';
+  } else {
+    const label = toggle.childNodes[1];
+    if (label) label.textContent = ' Add details';
+  }
+}
+
+// Field registry: field-id -> current value, used for conditional logic
+const FIELD_VALUES = {};
+
+function onFieldChange(fieldId, value) {
+  FIELD_VALUES[fieldId] = value;
+  // Re-evaluate all conditional rows
+  document.querySelectorAll('.q-row.conditional').forEach(row => {
+    const triggerField = row.dataset.showIfField;
+    const triggerValues = (row.dataset.showIfValues || '').split('|');
+    if (triggerField === fieldId) {
+      const shouldShow = triggerValues.includes(value);
+      row.classList.toggle('visible', shouldShow);
+      if (!shouldShow) {
+        // Clear inputs in hidden rows so they don't pollute saved data
+        row.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+        row.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+        row.querySelectorAll('textarea').forEach(el => el.value = '');
+      }
+    }
+  });
+}
+
+// Call after loadAnswers to re-trigger conditional visibility
+function refreshConditionals() {
+  Object.entries(FIELD_VALUES).forEach(([fieldId, value]) => {
+    onFieldChange(fieldId, value);
+  });
+  // Also scan current DOM values for any field with a data-field-id
+  document.querySelectorAll('[data-field-id]').forEach(row => {
+    const fieldId = row.dataset.fieldId;
+    // find the input inside it
+    const sel = row.querySelector('select');
+    const radio = row.querySelector('input[type=radio]:checked');
+    const val = sel ? sel.value : (radio ? radio.value : '');
+    if (val) onFieldChange(fieldId, val);
+  });
 }
 
 function getAnswers() {
@@ -470,9 +588,40 @@ function getAnswers() {
 
 function loadAnswers(a) {
   document.querySelectorAll('.q-text, .q-select').forEach(el => { el.value = a[`${el.dataset.s}_${el.dataset.q}`] || ''; });
-  document.querySelectorAll('.q-notes').forEach(el => { el.value = a[`${el.dataset.s}_${el.dataset.q}_n`] || ''; });
-  document.querySelectorAll('.q-radio-group').forEach(g => { const v = a[`${g.dataset.s}_${g.dataset.q}`] || ''; g.querySelectorAll('input').forEach(r => r.checked = r.value === v); });
+  document.querySelectorAll('.q-notes').forEach(el => {
+    const val = a[`${el.dataset.s}_${el.dataset.q}_n`] || '';
+    el.value = val;
+    // Auto-open the notes area if there's a saved value
+    if (val) {
+      const area = el.closest('.q-notes-area');
+      const wrap = el.closest('.q-notes-wrap');
+      if (area) area.classList.add('open');
+      if (wrap) {
+        const toggle = wrap.querySelector('.q-notes-toggle');
+        if (toggle) {
+          toggle.classList.add('open');
+          const icon = toggle.querySelector('.toggle-icon');
+          if (icon) icon.style.transform = 'rotate(90deg)';
+          const label = toggle.childNodes[1];
+          if (label) label.textContent = ' Hide details';
+        }
+      }
+    }
+  });
+  document.querySelectorAll('.q-radio-group').forEach(g => {
+    const v = a[`${g.dataset.s}_${g.dataset.q}`] || '';
+    g.querySelectorAll('input').forEach(r => r.checked = r.value === v);
+    // Trigger field change for any field-id radios
+    const row = g.closest('[data-field-id]');
+    if (row && v) FIELD_VALUES[row.dataset.fieldId] = v;
+  });
   document.querySelectorAll('.q-check-group').forEach(g => { const vs = (a[`${g.dataset.s}_${g.dataset.q}`] || '').split(', ').filter(Boolean); g.querySelectorAll('input').forEach(c => c.checked = vs.includes(c.value)); });
+  document.querySelectorAll('select.q-select').forEach(el => {
+    const row = el.closest('[data-field-id]');
+    if (row && el.value) FIELD_VALUES[row.dataset.fieldId] = el.value;
+  });
+  // Re-evaluate all conditional visibility after loading
+  refreshConditionals();
 }
 
 function getRes() {
