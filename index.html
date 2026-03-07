@@ -13,6 +13,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+  .d-none { display: none !important; }
 
   /* TOP BAR */
   .topbar {
@@ -188,7 +189,7 @@
     <button class="btn btn-outline no-print" onclick="clearForm()">✕ New Form</button>
     <button class="btn btn-outline no-print" onclick="window.print()">🖨 Print</button>
     <button class="btn btn-outline no-print" onclick="generateLink()">🔗 Client Link</button>
-    <button class="btn btn-primary no-print" onclick="saveLocal()">💾 Save Local</button>
+    <button class="btn btn-primary no-print d-none" onclick="saveLocal()">💾 Save Local</button>
     <button class="btn btn-gold no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
   </div>
 </div>
@@ -367,7 +368,7 @@ const SECTIONS = [
   {
     title: "Health & Emergencies", subtitle: "Cover this completely",
     questions: [
-      { q: "Any medical issues or ongoing conditions?", type: "radio", id: "has_medical",
+      { q: "Any medical issues or medications?", type: "radio", id: "has_medical",
         options: ["Yes", "No"], notes: "Describe conditions" },
       { q: "Any medications required?", type: "radio", id: "has_meds",
         options: ["Yes", "No"], notes: "Medication name, dosage, timing, and how to administer",
