@@ -457,14 +457,112 @@
   }
 
   /* ── PRINT ── */
+  #printView { display: none; }
+
   @media print {
+    /* Hide everything except the generated print view */
     .topbar, .clients-panel, .no-print,
-    .mobile-utility-bar, .sitter-sticky-bar { display: none !important; }
-    body { background: white; }
-    .section, .res-section { break-inside: avoid; box-shadow: none; }
-    .form-wrap { margin-top: 8px; }
-    .q-text, .q-select, .q-notes { border: none; border-bottom: 1px solid #ccc; border-radius: 0; background: transparent; }
-    .q-radio-group label, .q-check-group label { border: 1px solid #ccc; }
+    .mobile-utility-bar, .sitter-sticky-bar,
+    .sticky-submit, .client-submit-bar,
+    .client-banner, .modal-overlay, .toast,
+    .form-wrap, #clientConfirmation { display: none !important; }
+
+    body { background: white; margin: 0; }
+
+    #printView { display: block !important; }
+
+    #printView {
+      font-family: 'DM Sans', Georgia, serif;
+      font-size: 9.5pt;
+      color: #0f172a;
+      padding: 14pt 18pt;
+      margin: 0;
+    }
+
+    .pv-header {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8pt;
+      margin-bottom: 10pt;
+    }
+    .pv-header-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 6pt;
+    }
+    .pv-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+    .pv-subtitle {
+      font-size: 8pt;
+      color: #64748b;
+    }
+    .pv-res-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4pt 10pt;
+    }
+    .pv-res-label {
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+    .pv-res-value {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .pv-res-item.wide { grid-column: span 2; }
+    .pv-res-item.full { grid-column: 1 / -1; }
+
+    .pv-body {
+      columns: 2;
+      column-gap: 18pt;
+    }
+    .pv-section {
+      break-inside: avoid;
+      margin-bottom: 9pt;
+    }
+    .pv-section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #2563eb;
+      border-bottom: 1px solid #bfdbfe;
+      padding-bottom: 2pt;
+      margin-bottom: 5pt;
+    }
+    .pv-item {
+      margin-bottom: 5pt;
+      break-inside: avoid;
+    }
+    .pv-q {
+      font-size: 8pt;
+      color: #475569;
+      margin-bottom: 1pt;
+      line-height: 1.3;
+    }
+    .pv-a {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.35;
+    }
+    .pv-notes {
+      font-size: 8.5pt;
+      font-style: italic;
+      color: #334155;
+      margin-top: 1pt;
+      padding-left: 8pt;
+      line-height: 1.4;
+    }
   }
 </style>
 </head>
@@ -604,6 +702,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="printView"></div>
 
 <script>
 const SECTIONS = [
@@ -1265,6 +1364,78 @@ function showToast(msg, type='') {
   t.textContent = msg; t.className = 'toast show' + (type ? ' ' + type : '');
   setTimeout(() => t.className = 'toast', 2800);
 }
+
+// ── PRINT VIEW ──
+
+function buildPrintView() {
+  const res = getRes();
+  const answers = getAnswers();
+
+  // ── Header / Reservation block ──
+  const name    = [res.firstName, res.lastName].filter(Boolean).join(' ');
+  const resNum  = res.reservationNum;
+  const cats    = res.catNames;
+  const fmtDate = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const dates   = (res.dateStart || res.dateEnd)
+    ? [fmtDate(res.dateStart), fmtDate(res.dateEnd)].filter(Boolean).join(' – ')
+    : '';
+  const addrParts = [res.addrStreet, res.addrCity, res.addrState, res.addrZip].filter(Boolean);
+  const addr = addrParts.length ? addrParts.join(', ') : '';
+
+  const resItems = [
+    name    ? `<div class="pv-res-item wide"><div class="pv-res-label">Client</div><div class="pv-res-value">${name}</div></div>` : '',
+    resNum  ? `<div class="pv-res-item"><div class="pv-res-label">Reservation #</div><div class="pv-res-value">${resNum}</div></div>` : '',
+    cats    ? `<div class="pv-res-item"><div class="pv-res-label">Cat(s)</div><div class="pv-res-value">${cats}</div></div>` : '',
+    dates   ? `<div class="pv-res-item wide"><div class="pv-res-label">Dates</div><div class="pv-res-value">${dates}</div></div>` : '',
+    addr    ? `<div class="pv-res-item full"><div class="pv-res-label">Address</div><div class="pv-res-value">${addr}</div></div>` : '',
+  ].filter(Boolean).join('');
+
+  const printedOn = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  let html = `
+    <div class="pv-header">
+      <div class="pv-header-top">
+        <div class="pv-title">🐾 Meowtel Cat Care Summary</div>
+        <div class="pv-subtitle">Printed ${printedOn}</div>
+      </div>
+      <div class="pv-res-grid">${resItems}</div>
+    </div>
+    <div class="pv-body">`;
+
+  // ── Sections ──
+  SECTIONS.forEach((sec, si) => {
+    const items = [];
+    sec.questions.forEach((item, qi) => {
+      const key   = `${si}_${qi}`;
+      const val   = (answers[key] || '').trim();
+      const notes = (answers[key + '_n'] || '').trim();
+      if (!val && !notes) return; // skip unanswered
+      const notesHtml = notes ? `<div class="pv-notes">${notes}</div>` : '';
+      items.push(`
+        <div class="pv-item">
+          <div class="pv-q">${item.q}</div>
+          <div class="pv-a">${val || '—'}</div>
+          ${notesHtml}
+        </div>`);
+    });
+    if (!items.length) return; // skip empty sections
+    html += `
+      <div class="pv-section">
+        <div class="pv-section-title">${sec.title}</div>
+        ${items.join('')}
+      </div>`;
+  });
+
+  html += `</div>`; // close pv-body
+  return html;
+}
+
+window.addEventListener('beforeprint', () => {
+  document.getElementById('printView').innerHTML = buildPrintView();
+});
+window.addEventListener('afterprint', () => {
+  document.getElementById('printView').innerHTML = '';
+});
 
 buildForm();
 initMode();
