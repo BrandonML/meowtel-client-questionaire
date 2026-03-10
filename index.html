@@ -465,7 +465,8 @@
     .mobile-utility-bar, .sitter-sticky-bar,
     .sticky-submit, .client-submit-bar,
     .client-banner, .modal-overlay, .toast,
-    .form-wrap, #clientConfirmation { display: none !important; }
+    .form-wrap, #clientConfirmation,
+    .visit-panel, #visitGroupModal { display: none !important; }
 
     body { background: white; margin: 0; }
 
@@ -563,6 +564,305 @@
       line-height: 1.35;
     }
   }
+
+  /* ── VISIT SUMMARY (client end-of-reservation view) ── */
+  .vs-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    color: white; text-align: center; padding: 40px 24px 32px;
+  }
+  .vs-banner-inner { max-width: 560px; margin: 0 auto; }
+  .vs-paw { font-size: 44px; margin-bottom: 14px; }
+  .vs-banner h2 {
+    font-family: 'Poppins', sans-serif; font-size: 26px;
+    font-weight: 700; margin-bottom: 10px;
+  }
+  .vs-banner p { font-size: 14px; opacity: 0.8; line-height: 1.6; }
+  .vs-wrap { max-width: 720px; margin: 28px auto 60px; padding: 0 24px; }
+
+  /* Reservation header card */
+  .vs-res-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 10px 24px;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+  }
+  .vs-res-item { display: flex; flex-direction: column; gap: 2px; }
+  .vs-res-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .vs-res-value { font-size: 13px; font-weight: 500; color: var(--ink); }
+
+  /* Day cards */
+  .vs-day-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 12px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+  }
+  .vs-day-header {
+    background: var(--blue-xlt); border-bottom: 1px solid var(--blue-border);
+    padding: 10px 16px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+  }
+  .vs-day-date {
+    font-family: 'Poppins', sans-serif; font-size: 13px;
+    font-weight: 700; color: var(--ink);
+  }
+  .vs-day-meta { font-size: 11px; color: var(--muted); }
+  .vs-day-badge {
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; flex-shrink: 0;
+  }
+  .vs-day-badge.all-done { background: #dcfce7; color: #166534; }
+  .vs-day-badge.partial  { background: #fef9c3; color: #854d0e; }
+  .vs-day-badge.none     { background: var(--bg); color: var(--muted); }
+  .vs-task-list { padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .vs-task-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--ink-mid);
+  }
+  .vs-task-row.done { color: var(--ink); }
+  .vs-task-row.skipped { color: var(--muted-lt); }
+  .vs-task-dot {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .vs-task-row.done    .vs-task-dot { background: #dcfce7; color: #166534; }
+  .vs-task-row.skipped .vs-task-dot { background: var(--bg); color: var(--muted-lt); border: 1px solid var(--border); }
+  .vs-task-icon { font-size: 15px; }
+  .vs-task-label { flex: 1; }
+  .vs-task-row.skipped .vs-task-label { text-decoration: line-through; opacity: 0.5; }
+  .vs-no-tasks { font-size: 12px; color: var(--muted); font-style: italic; padding: 8px 0; }
+
+  /* Footer contact card */
+  .vs-footer {
+    background: var(--teal-lt); border: 1px solid #99f6e4;
+    border-radius: 10px; padding: 16px 20px; margin-top: 24px;
+    display: flex; flex-wrap: wrap; gap: 6px 24px;
+    font-size: 13px; line-height: 1.8; color: var(--ink);
+  }
+  .vs-footer a { color: var(--blue-dark); font-weight: 500; text-decoration: underline; }
+
+  /* ── VISIT PLANNER PANEL ── */
+  .visit-panel { max-width: 900px; margin: 0 auto; padding: 0 24px; display: none; }
+  .visit-panel.open { display: block; padding-top: 20px; }
+  .visit-panel-inner {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+    margin-bottom: 8px;
+  }
+  .vp-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .vp-header h2 {
+    font-family: 'Poppins', sans-serif; font-size: 17px;
+    color: var(--ink); margin-bottom: 4px;
+  }
+  .vp-header-sub { font-size: 12px; color: var(--muted); max-width: 480px; line-height: 1.5; }
+  .vp-header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+  /* Suggest bar */
+  .vp-suggest-bar {
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; font-size: 13px; color: #92400e;
+  }
+  .vp-suggest-icon { font-size: 16px; flex-shrink: 0; }
+  .vp-suggest-btn {
+    background: #f59e0b; color: white; border: none;
+    border-radius: 5px; padding: 4px 12px; font-size: 12px;
+    font-family: 'DM Sans', sans-serif; font-weight: 600;
+    cursor: pointer; margin-left: 6px; transition: background 0.15s;
+  }
+  .vp-suggest-btn:hover { background: #d97706; }
+
+  /* Visit group cards */
+  .vg-card {
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .vg-card-header {
+    background: var(--blue-xlt); border-bottom: 1px solid var(--blue-border);
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .vg-card-title { font-weight: 600; font-size: 14px; color: var(--ink); flex: 1; }
+  .vg-card-meta { font-size: 11px; color: var(--muted); }
+  .vg-card-actions { display: flex; gap: 6px; }
+  .vg-visits-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px; padding: 14px 16px;
+  }
+  @media (max-width: 500px) { .vg-visits-grid { grid-template-columns: 1fr 1fr; } }
+
+  /* Individual visit tile */
+  .visit-tile {
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    cursor: pointer; transition: all 0.15s; background: var(--surface);
+    position: relative;
+  }
+  .visit-tile:hover { border-color: var(--blue-mid); box-shadow: 0 2px 8px rgba(37,99,235,0.1); }
+  .visit-tile.complete { background: #f0fdf4; border-color: #86efac; }
+  .visit-tile.partial { background: #fffbeb; border-color: #fde68a; }
+  .visit-tile-date { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .visit-tile-time {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .visit-tile-progress {
+    margin-top: 8px; height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+  }
+  .visit-tile-progress-bar {
+    height: 100%; background: var(--blue); border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .visit-tile.complete .visit-tile-progress-bar { background: var(--green); }
+  .visit-tile-status {
+    font-size: 10px; font-weight: 600; margin-top: 5px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .visit-tile.complete .visit-tile-status { color: var(--green); }
+  .visit-tile.partial .visit-tile-status { color: #d97706; }
+  .visit-tile-check {
+    position: absolute; top: 8px; right: 8px;
+    font-size: 14px; opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .visit-tile.complete .visit-tile-check { opacity: 1; }
+
+  /* Tile expand panel */
+  .visit-tile-main { cursor: pointer; }
+  .visit-tile-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; }
+  .visit-tile-expand-hint {
+    font-size: 10px; color: var(--muted-lt); font-weight: 500;
+    transition: color 0.15s;
+  }
+  .visit-tile.expanded .visit-tile-expand-hint { color: var(--blue); }
+  .tile-task-expand {
+    border-top: 1px solid var(--border); margin-top: 8px; padding-top: 10px;
+  }
+  .tile-task-chips { display: flex; flex-direction: column; gap: 5px; }
+  .tile-task-chip {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--ink-mid); cursor: pointer;
+    padding: 4px 6px; border-radius: 5px; transition: background 0.12s;
+    user-select: none;
+  }
+  .tile-task-chip:hover { background: var(--blue-xlt); }
+  .tile-task-chip.done { color: var(--muted); text-decoration: line-through; }
+  .tile-chip-check {
+    width: 16px; height: 16px; border: 1.5px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 9px; flex-shrink: 0;
+    transition: all 0.12s; background: var(--surface);
+  }
+  .tile-task-chip.done .tile-chip-check {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+  .tile-open-btn {
+    margin-top: 8px; font-size: 11px; color: var(--blue);
+    background: none; border: none; cursor: pointer; padding: 0;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    transition: color 0.15s;
+  }
+  .tile-open-btn:hover { color: var(--blue-dark); text-decoration: underline; }
+
+  /* Checklist view */
+  .vp-cl-nav {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 16px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .vp-cl-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink); }
+  .cl-task-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; background: var(--surface);
+    transition: all 0.15s; cursor: pointer; user-select: none;
+  }
+  .cl-task-item:hover { border-color: var(--blue-border); background: var(--blue-xlt); }
+  .cl-task-item.done { background: #f0fdf4; border-color: #86efac; }
+  .cl-task-item.done .cl-task-label { text-decoration: line-through; color: var(--muted); }
+  .cl-task-check {
+    width: 20px; height: 20px; border: 2px solid var(--border);
+    border-radius: 50%; flex-shrink: 0; display: flex;
+    align-items: center; justify-content: center; font-size: 11px;
+    transition: all 0.15s; background: var(--surface);
+  }
+  .cl-task-item.done .cl-task-check {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+  .cl-task-icon { font-size: 16px; flex-shrink: 0; }
+  .cl-task-label { font-size: 13px; color: var(--ink); flex: 1; line-height: 1.4; }
+  .cl-task-note { font-size: 11px; color: var(--muted); font-style: italic; }
+  .cl-task-delete {
+    font-size: 12px; color: var(--muted-lt); background: none; border: none;
+    cursor: pointer; padding: 2px 6px; border-radius: 4px;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .cl-task-delete:hover { background: #fee2e2; color: var(--red); }
+  .vp-cl-add-wrap {
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .vp-cl-task-picker { margin-bottom: 4px; }
+  .vp-cl-add-input {
+    flex: 1; font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--surface); color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .vp-cl-add-input:focus { outline: none; border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+  /* Visit Group Modal specifics */
+  .vg-modal { max-width: 620px; max-height: 90vh; overflow-y: auto; }
+  .vg-form { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .vg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 500px) { .vg-row { grid-template-columns: 1fr; } }
+  .vg-field { display: flex; flex-direction: column; gap: 6px; }
+  .vg-field label {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .vg-visit-row {
+    display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;
+    align-items: center; padding: 8px 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; margin-bottom: 6px;
+  }
+  .vg-visit-row select, .vg-visit-row .res-input {
+    font-size: 12px; padding: 5px 8px;
+  }
+  .vg-visit-row-remove {
+    background: none; border: none; color: var(--muted-lt);
+    cursor: pointer; font-size: 14px; padding: 2px 6px;
+    border-radius: 4px; transition: all 0.15s;
+  }
+  .vg-visit-row-remove:hover { background: #fee2e2; color: var(--red); }
+  .vg-task-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+  .vg-task-pill {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border: 1px solid var(--border);
+    border-radius: 20px; font-size: 12px; cursor: pointer;
+    background: var(--surface); transition: all 0.15s;
+    color: var(--ink-mid); user-select: none;
+  }
+  .vg-task-pill:hover { border-color: var(--blue-mid); color: var(--blue-dark); }
+  .vg-task-pill.selected {
+    border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); font-weight: 600;
+  }
+  .vg-task-freq {
+    font-size: 10px; font-weight: 400; color: var(--muted);
+    background: rgba(0,0,0,0.06); border-radius: 4px;
+    padding: 1px 5px; margin-left: 4px; cursor: pointer;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .vg-task-freq:hover { background: rgba(37,99,235,0.15); color: var(--blue-dark); }
+  .vp-empty {
+    text-align: center; padding: 32px 20px;
+    color: var(--muted); font-size: 13px; font-style: italic;
+  }
+  .vp-empty-icon { font-size: 32px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -576,6 +876,7 @@
     <button class="btn btn-ghost no-print" onclick="window.print()">🖨 Print</button>
     <div class="topbar-divider no-print"></div>
     <button class="btn btn-ghost no-print" onclick="toggleClients()">📁 Saved Clients</button>
+    <button class="btn btn-ghost no-print" id="visitPlannerBtn" style="display:none" onclick="toggleVisitPlanner()">📅 Visit Planner</button>
     <button class="btn btn-primary no-print" onclick="saveToSheets()">📊 Save to Sheets</button>
     <button class="btn btn-hero no-print" onclick="saveAndGetLink()">🔗 Save &amp; Get Link</button>
   </div>
@@ -585,7 +886,8 @@
 <div class="mobile-utility-bar no-print" id="mobileUtilityBar">
   <button class="btn btn-ghost" onclick="clearForm()">✕ New</button>
   <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
-  <button class="btn btn-ghost" onclick="toggleClients()">📁 Saved Clients</button>
+  <button class="btn btn-ghost" onclick="toggleClients()">📁 Saved</button>
+  <button class="btn btn-ghost" id="visitPlannerBtnMobile" style="display:none" onclick="toggleVisitPlanner()">📅 Visits</button>
 </div>
 
 <!-- SITTER STICKY BOTTOM BAR (mobile only) -->
@@ -600,6 +902,74 @@
   <div class="clients-panel-inner">
     <h2>Saved Clients</h2>
     <div class="client-cards" id="clientCards"><p class="empty-state">No clients saved yet.</p></div>
+  </div>
+</div>
+
+<!-- VISIT PLANNER PANEL -->
+<div class="visit-panel" id="visitPanel">
+  <div class="visit-panel-inner">
+    <div class="vp-header">
+      <div>
+        <h2>📅 Visit Planner</h2>
+        <p class="vp-header-sub">Build your visit schedule, track tasks per visit, and mark them complete as you go. Saved locally on this device.</p>
+      </div>
+      <div class="vp-header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="clearVisitData()">🗑 Clear All</button>
+        <button class="btn btn-primary btn-sm" onclick="openVisitGroupModal()">+ Add Visit Group</button>
+      </div>
+    </div>
+    <div class="vp-suggest-bar" id="vpSuggestBar" style="display:none">
+      <span class="vp-suggest-icon">✨</span>
+      <span class="vp-suggest-text">Tasks can be pre-suggested from the intake form. <button class="vp-suggest-btn" onclick="applySuggestedTasks()">Apply Suggestions</button></span>
+    </div>
+    <div id="visitGroupsList"></div>
+    <div id="visitChecklistView" style="display:none">
+      <div class="vp-cl-nav">
+        <button class="btn btn-ghost btn-sm" onclick="closeChecklistView()">← Back to Planner</button>
+        <span class="vp-cl-title" id="clVisitTitle"></span>
+      </div>
+      <div id="clTaskList"></div>
+      <div class="vp-cl-add-wrap">
+        <div class="vp-cl-task-picker" id="clTaskPicker"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input class="vp-cl-add-input" id="clCustomTaskInput" type="text" placeholder="Or type a custom task…" onkeydown="if(event.key==='Enter')addCustomTask()">
+          <button class="btn btn-primary btn-sm" onclick="addCustomTask()">+ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT GROUP MODAL -->
+<div class="modal-overlay" id="visitGroupModal" style="display:none" onclick="if(event.target===this)closeVisitGroupModal()">
+  <div class="modal vg-modal">
+    <h3 id="vgModalTitle">Add Visit Group</h3>
+    <p>A visit group defines a repeating schedule pattern. Use multiple groups for different parts of your reservation (e.g., "twice daily 3/23–3/28, then once on 3/29").</p>
+    <div class="vg-form">
+      <div class="vg-row">
+        <div class="vg-field">
+          <label>Start Date <span class="req">*</span></label>
+          <input class="res-input" id="vgDateStart" type="date">
+        </div>
+        <div class="vg-field">
+          <label>End Date <span class="req">*</span></label>
+          <input class="res-input" id="vgDateEnd" type="date">
+        </div>
+      </div>
+      <div class="vg-field">
+        <label>Visits per day <span style="font-weight:400;color:var(--muted)">(add one row per visit)</span></label>
+        <div class="vg-visit-rows" id="vgVisitRows"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addVgVisitRow()">+ Add another visit</button>
+      </div>
+      <div class="vg-field">
+        <label>Default tasks for these visits</label>
+        <div class="vg-task-pills" id="vgTaskPills"></div>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-outline" style="color:var(--ink)" onclick="closeVisitGroupModal()">Cancel</button>
+      <button class="btn btn-hero" onclick="saveVisitGroup()">Save Group</button>
+    </div>
   </div>
 </div>
 
@@ -634,11 +1004,11 @@
     <div class="res-body">
       <div class="res-field">
         <label>First Name <span class="req">*</span></label>
-        <input class="res-input" id="firstName" type="text" placeholder="e.g. Sarah" autocomplete="given-name">
+        <input class="res-input" id="firstName" type="text" placeholder="e.g. Sarah" autocomplete="given-name" oninput="updateVisitPlannerVisibility()">
       </div>
       <div class="res-field">
         <label>Last Name <span class="req">*</span></label>
-        <input class="res-input" id="lastName" type="text" placeholder="e.g. Johnson" autocomplete="family-name">
+        <input class="res-input" id="lastName" type="text" placeholder="e.g. Johnson" autocomplete="family-name" oninput="updateVisitPlannerVisibility()">
       </div>
       <div class="res-field">
         <label>Reservation #</label>
@@ -688,6 +1058,27 @@
       <div>💬 Message on <strong>Meowtel</strong></div>
       <div>📱 Text: <a href="sms:8132396027" style="color:var(--blue-dark); text-decoration:underline; font-weight:500;">(813) 239-6027</a></div>
       <div>✉️ Email: <a href="mailto:bscivolette@gmail.com" style="color:var(--blue-dark); text-decoration:underline; font-weight:500;">bscivolette@gmail.com</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT SUMMARY SCREEN (shown when reservation is complete) -->
+<div id="visitSummary" style="display:none">
+  <div class="vs-banner">
+    <div class="vs-banner-inner">
+      <div class="vs-paw">🐾</div>
+      <h2 id="vsBannerTitle">Reservation Complete</h2>
+      <p id="vsBannerSub"></p>
+    </div>
+  </div>
+  <div class="vs-wrap">
+    <div class="vs-res-card" id="vsResCard"></div>
+    <div id="vsDayList"></div>
+    <div class="vs-footer">
+      <strong>Brandon Scivolette</strong>
+      <span>💬 Message on <strong>Meowtel</strong></span>
+      <span>📱 <a href="sms:8132396027">(813) 239-6027</a></span>
+      <span>✉️ <a href="mailto:bscivolette@gmail.com">bscivolette@gmail.com</a></span>
     </div>
   </div>
 </div>
@@ -1024,6 +1415,8 @@ function getRes() {
 function setRes(r) {
   document.getElementById('firstName').value = r.firstName || '';
   document.getElementById('lastName').value  = r.lastName  || '';
+  // Defer so DOM values are set before checking
+  setTimeout(updateVisitPlannerVisibility, 0);
   document.getElementById('reservationNum').value = r.reservationNum || '';
   document.getElementById('catNames').value  = r.catNames  || '';
   document.getElementById('dateStart').value = toDateInputValue(r.dateStart);
@@ -1071,12 +1464,21 @@ function validate() {
 }
 
 function clearForm() {
+  // Clear visit planner data for current client before wiping the res number
+  localStorage.removeItem(vpStorageKey());
+
   setRes({});
   document.querySelectorAll('.q-text,.q-select,.q-notes').forEach(el => el.value = '');
   document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el => el.checked = false);
   document.querySelectorAll('.res-input').forEach(el => el.classList.remove('invalid'));
   Object.keys(FIELD_VALUES).forEach(k => delete FIELD_VALUES[k]);
   document.querySelectorAll('.q-row.conditional').forEach(r => r.classList.remove('visible'));
+
+  // Close and reset visit planner panel
+  const vp = document.getElementById('visitPanel');
+  if (vp) vp.classList.remove('open');
+  updateVisitPlannerVisibility();
+
   showToast('Form cleared — ready for new client');
 }
 
@@ -1141,13 +1543,8 @@ function renderClientCards(rows, headers) {
   container._headers = headers;
 }
 
-async function loadClientFromSheets(idx) {
-  const container = document.getElementById('clientCards');
-  const rows    = container._rows;
-  const headers = container._headers;
-  if (!rows || !rows[idx]) return;
-
-  const row = rows[idx];
+// Shared helper: parse a single Sheets row + headers into { res, answers, vpData }
+function parseSheetRow(row, headers) {
   const col = (name) => headers.indexOf(name);
 
   const res = {
@@ -1155,13 +1552,9 @@ async function loadClientFromSheets(idx) {
     lastName:       row[col('Last Name')]     || '',
     reservationNum: row[col('Reservation #')] || '',
     catNames:       row[col('Cat Name(s)')]   || '',
-    // BUG FIX: pass raw value through toDateInputValue (handled inside setRes)
     dateStart:      row[col('Date Start')]    || '',
     dateEnd:        row[col('Date End')]      || '',
-    addrStreet: '',
-    addrCity:   '',
-    addrState:  '',
-    addrZip:    '',
+    addrStreet: '', addrCity: '', addrState: '', addrZip: '',
   };
 
   const addr = row[col('Address')] || '';
@@ -1174,19 +1567,47 @@ async function loadClientFromSheets(idx) {
   const answers = {};
   SECTIONS.forEach((sec, si) => {
     sec.questions.forEach((item, qi) => {
-      const colName = `[${sec.title}] ${item.q}`;
-      const val = row[col(colName)];
+      const val = row[col(`[${sec.title}] ${item.q}`)];
       if (val !== undefined) answers[`${si}_${qi}`] = val;
       if (item.notes) {
-        const notesCol = `[${sec.title}] ${item.q} — notes`;
-        const nval = row[col(notesCol)];
+        const nval = row[col(`[${sec.title}] ${item.q} — notes`)];
         if (nval !== undefined) answers[`${si}_${qi}_n`] = nval;
       }
     });
   });
 
+  let vpData = null;
+  const vsRaw = row[col('Visit Schedule')];
+  if (vsRaw) {
+    try {
+      const parsed = JSON.parse(vsRaw);
+      vpData = Array.isArray(parsed)
+        ? { groups: parsed, visitOverrides: {} }
+        : { groups: parsed.groups || [], visitOverrides: parsed.overrides || {} };
+    } catch(e) { console.warn('Could not parse Visit Schedule from Sheets', e); }
+  }
+
+  return { res, answers, vpData };
+}
+
+async function loadClientFromSheets(idx) {
+  const container = document.getElementById('clientCards');
+  const rows    = container._rows;
+  const headers = container._headers;
+  if (!rows || !rows[idx]) return;
+
+  const { res, answers, vpData } = parseSheetRow(rows[idx], headers);
+
   setRes(res);
   loadAnswers(answers);
+
+  if (vpData) {
+    const existing = vpLoad();
+    existing.groups = vpData.groups;
+    existing.visitOverrides = vpData.visitOverrides;
+    vpSave(existing);
+  }
+
   toggleClients();
   showToast(`Loaded: ${res.firstName} ${res.lastName}`, 'success');
 }
@@ -1203,11 +1624,15 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwBuU8h9p18gFbQO62Nm
 
 function buildPayload() {
   const res = getRes();
+  const vpData = vpLoad();
   return {
     ...res,
     clientName: `${res.firstName} ${res.lastName}`,
     answers: getAnswers(),
-    sections: SECTIONS.map(s => ({ title: s.title, questions: s.questions.map(q => ({ q: q.q, notes: q.notes || null })) }))
+    sections: SECTIONS.map(s => ({ title: s.title, questions: s.questions.map(q => ({ q: q.q, notes: q.notes || null })) })),
+    visitSchedule: (vpData.groups.length || Object.keys(vpData.visitOverrides || {}).length)
+      ? JSON.stringify({ groups: vpData.groups, overrides: vpData.visitOverrides || {} })
+      : ''
   };
 }
 
@@ -1241,7 +1666,16 @@ async function saveAndGetLink() {
   try {
     await postToSheets(buildPayload());
     showToast(`✓ Saved. Generating link…`, 'success');
-    const encoded = btoa(JSON.stringify(res));
+    // Encode reservation details + VP state so the link works as both
+    // intake form (before end date) and visit summary (after end date)
+    const vpData = vpLoad();
+    const linkPayload = {
+      ...res,
+      _vp: (vpData.groups.length || Object.keys(vpData.visitOverrides || {}).length)
+        ? { groups: vpData.groups, overrides: vpData.visitOverrides || {} }
+        : null
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(linkPayload))));
     const url = `${BASE_URL}?client=${encoded}`;
     document.getElementById('modalUrl').textContent = url;
     document.getElementById('linkModal').style.display = 'flex';
@@ -1261,7 +1695,30 @@ function initMode() {
   if (!encoded) return;
 
   try {
-    const res = JSON.parse(atob(encoded));
+    let decoded;
+    try {
+      // Primary: URI-safe encoding (btoa(unescape(encodeURIComponent(...))))
+      decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    } catch(e1) {
+      // Fallback: legacy plain btoa(JSON.stringify(...)) links
+      try { decoded = JSON.parse(atob(encoded)); }
+      catch(e2) { throw new Error('Could not decode client param: ' + e2.message); }
+    }
+
+    const res  = decoded;
+    const vpData = decoded._vp || null; // VP state embedded in link, if present
+
+    // ── Determine if reservation is in the past ──
+    const isComplete = decoded.dateEnd
+      ? new Date(decoded.dateEnd + 'T23:59:59') < new Date()
+      : false;
+
+    if (isComplete && vpData) {
+      showVisitSummary(res, vpData);
+      return;
+    }
+
+    // ── Normal intake form flow ──
     buildForm(true);
     setRes(res);
 
@@ -1278,7 +1735,6 @@ function initMode() {
     document.getElementById('formTitle').innerHTML = 'Your Cat Care <em>Questionnaire</em>';
     document.getElementById('sitterActions').style.display = 'none';
     document.getElementById('clientsPanel').style.display = 'none';
-    // Hide mobile sitter UI in client mode
     document.getElementById('mobileUtilityBar').style.display = 'none';
     document.getElementById('sitterStickyBar').style.display = 'none';
 
@@ -1292,6 +1748,9 @@ function initMode() {
     document.getElementById('stickySubmit').style.display = 'block';
     document.getElementById('clientSubmitBar').style.display = 'none';
     document.body.classList.add('client-mode');
+
+    // Fetch latest answers from Sheets so client always sees current data
+    fetchAndApplyClientAnswers(res);
   } catch(e) {
     console.error('Invalid client param', e);
   }
@@ -1438,6 +1897,746 @@ window.addEventListener('afterprint', () => {
 
 buildForm();
 initMode();
+
+// ── Fetch latest answers from Sheets for client view ──
+async function fetchAndApplyClientAnswers(res) {
+  // res is the full decoded object from the link (has firstName, lastName, reservationNum, etc.)
+  const resNum = (res.reservationNum || '').toString().trim();
+  const firstName = (res.firstName || '').trim().toLowerCase();
+  const lastName  = (res.lastName  || '').trim().toLowerCase();
+
+  // Need at least a name or res# to find the row
+  if (!resNum && !firstName && !lastName) return;
+
+  try {
+    const resp = await fetch(SHEETS_URL + '?action=list');
+    const data = await resp.json();
+    if (!data.rows || !data.headers) return;
+
+    const col = (name) => data.headers.indexOf(name);
+    const resNumCol  = col('Reservation #');
+    const firstCol   = col('First Name');
+    const lastCol    = col('Last Name');
+
+    // Match by res# first (most precise), fall back to first+last name
+    let row = null;
+    if (resNum) {
+      row = data.rows.find(r => (r[resNumCol] || '').toString().trim() === resNum);
+    }
+    if (!row && firstName && lastName) {
+      row = data.rows.find(r =>
+        (r[firstCol] || '').trim().toLowerCase() === firstName &&
+        (r[lastCol]  || '').trim().toLowerCase() === lastName
+      );
+    }
+    if (!row) return; // no match — form stays blank
+
+    const { answers } = parseSheetRow(row, data.headers);
+    loadAnswers(answers);
+  } catch(e) {
+    console.warn('Could not fetch answers from Sheets for client view', e);
+  }
+}
+
+// ── VISIT SUMMARY (end-of-reservation client view) ──
+
+function showVisitSummary(res, vpData) {
+  // Hide all sitter UI
+  document.querySelector('.topbar-brand').innerHTML = '🐾 <span>Meowtel</span>';
+  document.getElementById('sitterActions').style.display = 'none';
+  document.getElementById('mobileUtilityBar').style.display = 'none';
+  document.getElementById('sitterStickyBar').style.display = 'none';
+  document.getElementById('clientsPanel').style.display = 'none';
+  document.getElementById('clientBanner').style.display = 'none';
+  document.getElementById('stickySubmit').style.display = 'none';
+  document.getElementById('clientSubmitBar').style.display = 'none';
+  document.querySelector('.form-wrap').style.display = 'none';
+
+  // Banner
+  const name = [res.firstName, res.lastName].filter(Boolean).join(' ');
+  const cats = res.catNames || '';
+  document.getElementById('vsBannerTitle').textContent =
+    name ? `Thank you, ${name}!` : 'Reservation Complete';
+  document.getElementById('vsBannerSub').textContent =
+    cats
+      ? `Here's a recap of every visit during your stay. ${cats} was in great hands.`
+      : `Here's a recap of every visit during your stay.`;
+
+  // Reservation header card
+  const fmtDate = iso => iso
+    ? new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '';
+  const dates = [fmtDate(res.dateStart), fmtDate(res.dateEnd)].filter(Boolean).join(' – ');
+  const addr  = [res.addrStreet, res.addrCity, res.addrState, res.addrZip].filter(Boolean).join(', ');
+
+  const resItems = [
+    name   ? `<div class="vs-res-item"><div class="vs-res-label">Client</div><div class="vs-res-value">${name}</div></div>` : '',
+    res.reservationNum ? `<div class="vs-res-item"><div class="vs-res-label">Reservation #</div><div class="vs-res-value">${res.reservationNum}</div></div>` : '',
+    cats   ? `<div class="vs-res-item"><div class="vs-res-label">Cat(s)</div><div class="vs-res-value">${cats}</div></div>` : '',
+    dates  ? `<div class="vs-res-item"><div class="vs-res-label">Dates</div><div class="vs-res-value">${dates}</div></div>` : '',
+    addr   ? `<div class="vs-res-item"><div class="vs-res-label">Address</div><div class="vs-res-value">${addr}</div></div>` : '',
+  ].filter(Boolean).join('');
+  document.getElementById('vsResCard').innerHTML = resItems;
+
+  // Build day list from VP data
+  const groups   = vpData.groups   || [];
+  const overrides = vpData.overrides || {};
+  const dayEl    = document.getElementById('vsDayList');
+
+  if (!groups.length) {
+    dayEl.innerHTML = `<p style="color:var(--muted);font-style:italic;font-size:13px">No visit schedule was recorded for this reservation.</p>`;
+  } else {
+    // Collect all visits across all groups, sorted by date
+    const allVisits = [];
+    groups.forEach((g, gi) => {
+      const start = new Date(g.dateStart + 'T12:00:00');
+      const end   = new Date(g.dateEnd   + 'T12:00:00');
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const iso = d.toISOString().slice(0, 10);
+        const dayIndex = Math.round((d - start) / 86400000);
+        g.visitsPerDay.forEach((v, vi) => {
+          const visitKey = `${iso}_${vi}`;
+          // Resolve tasks: override takes precedence, else derive from defaultTasks + freq
+          let tasks;
+          if (overrides[visitKey]) {
+            tasks = overrides[visitKey];
+          } else {
+            tasks = (g.defaultTasks || [])
+              .filter(t => {
+                const freq = typeof t === 'string' ? 'every' : (t.freq || 'every');
+                if (freq === 'every') return true;
+                if (freq === 'odd')  return dayIndex % 2 === 0;
+                if (freq === 'even') return dayIndex % 2 === 1;
+                return true;
+              })
+              .map(t => {
+                const id  = typeof t === 'string' ? t : t.id;
+                const def = (typeof ALL_TASKS !== 'undefined')
+                  ? ALL_TASKS.find(x => x.id === id) : null;
+                return { id, icon: def?.icon || '📌', label: def?.label || id, done: false };
+              });
+          }
+          allVisits.push({ date: iso, timeWindow: v.timeWindow, duration: v.duration, visitKey, tasks });
+        });
+      }
+    });
+
+    allVisits.sort((a, b) => a.date.localeCompare(b.date) || a.visitKey.localeCompare(b.visitKey));
+
+    const twLabel = tw => ({ morning: '🌅 Morning', midday: '☀️ Midday', evening: '🌆 Evening', nopref: '🕐 Any time' })[tw] || tw;
+    const fmtDay  = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    dayEl.innerHTML = allVisits.map(v => {
+      const doneTasks    = v.tasks.filter(t => t.done);
+      const skippedTasks = v.tasks.filter(t => !t.done);
+      const allDone  = v.tasks.length > 0 && skippedTasks.length === 0;
+      const noneDone = doneTasks.length === 0;
+      const badgeClass = allDone ? 'all-done' : noneDone ? 'none' : 'partial';
+      const badgeText  = allDone ? '✓ All complete' : noneDone ? 'No completions recorded' : `${doneTasks.length} of ${v.tasks.length} complete`;
+
+      const taskRows = v.tasks.map(t => `
+        <div class="vs-task-row ${t.done ? 'done' : 'skipped'}">
+          <div class="vs-task-dot">${t.done ? '✓' : '–'}</div>
+          <div class="vs-task-icon">${t.icon}</div>
+          <div class="vs-task-label">${t.label}</div>
+        </div>`).join('');
+
+      return `<div class="vs-day-card">
+        <div class="vs-day-header">
+          <div>
+            <div class="vs-day-date">${fmtDay(v.date)}</div>
+            <div class="vs-day-meta">${twLabel(v.timeWindow)} · ${v.duration} min</div>
+          </div>
+          <div class="vs-day-badge ${badgeClass}">${badgeText}</div>
+        </div>
+        <div class="vs-task-list">
+          ${v.tasks.length ? taskRows : '<div class="vs-no-tasks">No tasks recorded for this visit.</div>'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('visitSummary').style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════════
+// VISIT PLANNER
+// ══════════════════════════════════════════════════════════════
+
+// ── All possible tasks with icons and smart-suggest logic ──
+const ALL_TASKS = [
+  { id: 'feed',       icon: '🍽️',  label: 'Feed cats',             always: true },
+  { id: 'water',      icon: '💧',  label: 'Refresh water',         always: true },
+  { id: 'litter',     icon: '🪣',  label: 'Scoop litter box',      always: true },
+  { id: 'headcount',  icon: '🐱',  label: 'Do a headcount',        always: true },
+  { id: 'lockup',     icon: '🔒',  label: 'Lock up / secure door', always: true },
+  { id: 'photos',     icon: '📸',  label: 'Send photo update',     suggestIf: (a) => a['5_0'] && a['5_0'] !== 'Not necessary' },
+  { id: 'play',       icon: '🧶',  label: 'Playtime / enrichment', suggestIf: (a) => a['3_2'] && a['3_2'].includes('Interactive play') },
+  { id: 'brush',      icon: '🪮',  label: 'Brushing / grooming',   suggestIf: (a) => a['3_2'] && a['3_2'].includes('Brushing') },
+  { id: 'meds',       icon: '💊',  label: 'Administer medication', suggestIf: (a) => a['4_1'] === 'Yes' },
+  { id: 'fountain',   icon: '⛲',  label: 'Clean/refill fountain', always: false },
+  { id: 'mail',       icon: '📬',  label: 'Collect mail',          suggestIf: (a) => a['6_0'] && a['6_0'] !== 'No' },
+  { id: 'packages',   icon: '📦',  label: 'Bring in packages',     suggestIf: (a) => a['6_0'] && a['6_0'] !== 'No' },
+  { id: 'plants',     icon: '🪴',  label: 'Water plants',          suggestIf: (a) => a['6_1'] === 'Yes' },
+  { id: 'lights',     icon: '💡',  label: 'Check lights',          suggestIf: (a) => a['6_3'] && a['6_3'] !== 'Leave as-is' },
+  { id: 'trash',      icon: '🗑️',  label: 'Take out/bring in bins', always: false },
+  { id: 'windows',    icon: '🪟',  label: 'Check windows locked',  always: false },
+  { id: 'hairball',   icon: '🧹',  label: 'Check for hairballs',   always: false },
+  { id: 'autofeeder', icon: '🤖',  label: 'Check auto-feeder',     always: false },
+  { id: 'note',       icon: '📝',  label: 'Leave note for client', always: false },
+  { id: 'key',        icon: '🗝️',  label: 'Return/secure key',     always: false },
+  { id: 'walkthrough',icon: '🚶',  label: 'Final walkthrough',     always: false },
+];
+
+// Storage key helpers
+function vpStorageKey() {
+  const resNum = document.getElementById('reservationNum').value.trim();
+  // Never use a shared 'default' key — if no res# yet, use a session key
+  // so different clients don't clobber each other's visit data
+  if (resNum) return 'meowtel_vp_' + resNum;
+  const firstName = (document.getElementById('firstName')?.value || '').trim();
+  const lastName  = (document.getElementById('lastName')?.value  || '').trim();
+  if (firstName || lastName) return 'meowtel_vp_name_' + (firstName + '_' + lastName).toLowerCase().replace(/\s+/g,'_');
+  return 'meowtel_vp_unsaved';
+}
+
+function vpLoad() {
+  try { return JSON.parse(localStorage.getItem(vpStorageKey()) || 'null') || { groups: [] }; }
+  catch(e) { return { groups: [] }; }
+}
+
+function vpSave(data) {
+  localStorage.setItem(vpStorageKey(), JSON.stringify(data));
+}
+
+// ── Visit planner button visibility ──
+function updateVisitPlannerVisibility() {
+  const firstName = (document.getElementById('firstName')?.value || '').trim();
+  const lastName  = (document.getElementById('lastName')?.value  || '').trim();
+  const hasClient = !!(firstName || lastName);
+  const btn       = document.getElementById('visitPlannerBtn');
+  const btnMobile = document.getElementById('visitPlannerBtnMobile');
+  if (btn)       btn.style.display       = hasClient ? '' : 'none';
+  if (btnMobile) btnMobile.style.display = hasClient ? '' : 'none';
+  // If client cleared, also close the panel
+  if (!hasClient) {
+    const vp = document.getElementById('visitPanel');
+    if (vp) vp.classList.remove('open');
+  }
+}
+
+// ── Toggle panel ──
+function toggleVisitPlanner() {
+  const panel = document.getElementById('visitPanel');
+  const isOpen = panel.classList.toggle('open');
+
+  // Close clients panel if open
+  if (isOpen) document.getElementById('clientsPanel').classList.remove('open');
+
+  if (isOpen) renderVisitPlanner();
+}
+
+// ── Main render ──
+function renderVisitPlanner() {
+  const data = vpLoad();
+  const answers = getAnswers();
+  const listEl = document.getElementById('visitGroupsList');
+  const checklistEl = document.getElementById('visitChecklistView');
+
+  checklistEl.style.display = 'none';
+  listEl.style.display = 'block';
+
+  // Show suggest bar only when there are unapplied suggestions
+  const suggestBar = document.getElementById('vpSuggestBar');
+  const hasAnswers = Object.values(answers).some(v => v);
+  if (hasAnswers && data.groups.length) {
+    const suggested = getSuggestedTaskIds();
+    const allApplied = data.groups.every(g =>
+      suggested.every(id => (g.defaultTasks || []).includes(id))
+    );
+    suggestBar.style.display = allApplied ? 'none' : 'flex';
+  } else if (hasAnswers && !data.groups.length) {
+    // No groups yet — show the bar as a heads-up but change message
+    suggestBar.style.display = 'flex';
+  } else {
+    suggestBar.style.display = 'none';
+  }
+
+  if (!data.groups.length) {
+    listEl.innerHTML = `<div class="vp-empty"><div class="vp-empty-icon">📅</div>No visit groups yet. Click <strong>+ Add Visit Group</strong> to build your schedule.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = data.groups.map((g, gi) => renderGroupCard(g, gi, data)).join('');
+}
+
+function renderGroupCard(g, gi, data) {
+  const fmtD = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const allVisits = expandGroupVisits(g);
+  const total = allVisits.length;
+  const done  = allVisits.filter(v => isVisitComplete(g, v.visitKey, data)).length;
+
+  const visitsHtml = allVisits.map(v => {
+    const tasks   = getVisitTasks(g, v.visitKey, data);
+    const total   = tasks.length;
+    const checked = tasks.filter(t => t.done).length;
+    const pct     = total > 0 ? Math.round(checked / total * 100) : 0;
+    const isComplete = total > 0 && checked === total;
+    const isPartial  = checked > 0 && checked < total;
+    const stateClass = isComplete ? 'complete' : isPartial ? 'partial' : '';
+    const statusText = isComplete ? '✓ Complete' : isPartial ? `${checked}/${total} done` : total > 0 ? `${total} tasks` : 'No tasks';
+    const tileId = `tile_${gi}_${v.visitKey.replace(/-/g,'').replace('_','')}`;
+
+    // Task chips for expand panel
+    const chipsHtml = tasks.map((t, ti) => `
+      <div class="tile-task-chip ${t.done ? 'done' : ''}" onclick="event.stopPropagation();toggleTaskFromTile(${gi},'${v.visitKey}',${ti},this)">
+        <span class="tile-chip-check">${t.done ? '✓' : ''}</span>
+        <span>${t.icon || '📌'} ${t.label}</span>
+      </div>`).join('');
+
+    return `<div class="visit-tile ${stateClass}" id="${tileId}">
+      <div class="visit-tile-main" onclick="toggleTileExpand('${tileId}')">
+        <div class="visit-tile-check">✓</div>
+        <div class="visit-tile-date">${fmtD(v.date)}</div>
+        <div class="visit-tile-time">${timeWindowLabel(v.timeWindow)} · ${v.duration} min</div>
+        <div class="visit-tile-progress"><div class="visit-tile-progress-bar" style="width:${pct}%"></div></div>
+        <div class="visit-tile-footer">
+          <span class="visit-tile-status">${statusText}</span>
+          <span class="visit-tile-expand-hint">${total > 0 ? '▾ tasks' : ''}</span>
+        </div>
+      </div>
+      <div class="tile-task-expand" id="${tileId}_expand" style="display:none">
+        <div class="tile-task-chips">${chipsHtml}</div>
+        <button class="tile-open-btn" onclick="event.stopPropagation();openChecklistView(${gi}, '${v.visitKey}')">Open full checklist →</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="vg-card">
+    <div class="vg-card-header">
+      <div class="vg-card-title">${fmtD(g.dateStart)} – ${fmtD(g.dateEnd)}</div>
+      <div class="vg-card-meta">${total} visits · ${done} complete</div>
+      <div class="vg-card-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editVisitGroup(${gi})">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteVisitGroup(${gi})">🗑</button>
+      </div>
+    </div>
+    <div class="vg-visits-grid">${visitsHtml}</div>
+  </div>`;
+}
+
+// ── Expand a group into individual visit objects ──
+function expandGroupVisits(g) {
+  const visits = [];
+  const start = new Date(g.dateStart + 'T12:00:00');
+  const end   = new Date(g.dateEnd   + 'T12:00:00');
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const iso = d.toISOString().slice(0, 10);
+    g.visitsPerDay.forEach((v, vi) => {
+      visits.push({ date: iso, timeWindow: v.timeWindow, duration: v.duration, visitKey: `${iso}_${vi}` });
+    });
+  }
+  return visits;
+}
+
+function timeWindowLabel(tw) {
+  const map = { 'morning': '🌅 Morning', 'midday': '☀️ Midday', 'evening': '🌆 Evening', 'nopref': '🕐 Any time' };
+  return map[tw] || tw;
+}
+
+// ── Task helpers ──
+function getVisitTasks(g, visitKey, data) {
+  // Visit-level overrides take precedence; fall back to group defaults
+  const overrides = (data.visitOverrides || {})[visitKey];
+  if (overrides) return overrides;
+
+  // Compute day index within the group (0-based) for every-other logic
+  const dateStr = visitKey.split('_')[0]; // visitKey format: YYYY-MM-DD_vi
+  const groupStart = new Date(g.dateStart + 'T12:00:00');
+  const visitDate  = new Date(dateStr     + 'T12:00:00');
+  const dayIndex = Math.round((visitDate - groupStart) / 86400000); // 0-based
+
+  return (g.defaultTasks || [])
+    .filter(taskEntry => {
+      const freq = typeof taskEntry === 'string' ? 'every' : (taskEntry.freq || 'every');
+      if (freq === 'every') return true;
+      if (freq === 'odd')  return dayIndex % 2 === 0; // 0,2,4… (first, third… day)
+      if (freq === 'even') return dayIndex % 2 === 1; // 1,3,5… (second, fourth… day)
+      return true;
+    })
+    .map(taskEntry => {
+      const taskId = typeof taskEntry === 'string' ? taskEntry : taskEntry.id;
+      const def = ALL_TASKS.find(t => t.id === taskId);
+      return { id: taskId, icon: def?.icon || '📌', label: def?.label || taskId, done: false };
+    });
+}
+
+function isVisitComplete(g, visitKey, data) {
+  const tasks = getVisitTasks(g, visitKey, data);
+  return tasks.length > 0 && tasks.every(t => t.done);
+}
+
+// ── Checklist view ──
+let currentGroupIdx = null;
+let currentVisitKey = null;
+
+function openChecklistView(gi, visitKey) {
+  currentGroupIdx = gi;
+  currentVisitKey = visitKey;
+
+  const data = vpLoad();
+  const g = data.groups[gi];
+  const allVisits = expandGroupVisits(g);
+  const v = allVisits.find(x => x.visitKey === visitKey);
+
+  document.getElementById('visitGroupsList').style.display = 'none';
+  document.getElementById('visitChecklistView').style.display = 'block';
+
+  const fmtD = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('clVisitTitle').textContent = v
+    ? `${fmtD(v.date)} · ${timeWindowLabel(v.timeWindow)} · ${v.duration} min`
+    : visitKey;
+
+  renderChecklist(gi, visitKey, data);
+  renderClTaskPicker(gi, visitKey, data);
+}
+
+function renderClTaskPicker(gi, visitKey, data) {
+  const el = document.getElementById('clTaskPicker');
+  if (!el) return;
+  const g = data.groups[gi];
+  const currentTasks = getVisitTasks(g, visitKey, data);
+  const currentIds = currentTasks.map(t => t.id);
+  const available = ALL_TASKS.filter(t => !currentIds.includes(t.id));
+  if (!available.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Add task from list</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">` +
+    available.map(t => `<div class="vg-task-pill" style="font-size:12px;padding:4px 10px;cursor:pointer" onclick="addTaskFromList('${t.id}',${gi},'${visitKey}')">${t.icon} ${t.label}</div>`).join('') +
+    '</div>';
+}
+
+function addTaskFromList(taskId, gi, visitKey) {
+  const data = vpLoad();
+  const g = data.groups[gi];
+  if (!data.visitOverrides) data.visitOverrides = {};
+  if (!data.visitOverrides[visitKey]) {
+    data.visitOverrides[visitKey] = getVisitTasks(g, visitKey, data).map(t => ({ ...t }));
+  }
+  const def = ALL_TASKS.find(t => t.id === taskId);
+  data.visitOverrides[visitKey].push({ id: taskId, icon: def?.icon || '📌', label: def?.label || taskId, done: false });
+  vpSave(data);
+  renderChecklist(gi, visitKey, data);
+  renderClTaskPicker(gi, visitKey, data);
+}
+
+function renderChecklist(gi, visitKey, data) {
+  const g = data.groups[gi];
+  const tasks = getVisitTasks(g, visitKey, data);
+  const el = document.getElementById('clTaskList');
+
+  if (!tasks.length) {
+    el.innerHTML = `<div class="vp-empty" style="padding:20px 0"><div class="vp-empty-icon">✅</div>No tasks yet. Add one below or go back and edit the group defaults.</div>`;
+    return;
+  }
+
+  el.innerHTML = tasks.map((t, ti) => `
+    <div class="cl-task-item ${t.done ? 'done' : ''}" onclick="toggleTask(${gi}, '${visitKey}', ${ti})">
+      <div class="cl-task-check">${t.done ? '✓' : ''}</div>
+      <div class="cl-task-icon">${t.icon || '📌'}</div>
+      <div class="cl-task-label">${t.label}</div>
+      <button class="cl-task-delete" onclick="event.stopPropagation();deleteTask(${gi},'${visitKey}',${ti})" title="Remove task">✕</button>
+    </div>`).join('');
+}
+
+function toggleTask(gi, visitKey, ti) {
+  const data = vpLoad();
+  const g = data.groups[gi];
+
+  // Ensure visit-level override exists
+  if (!data.visitOverrides) data.visitOverrides = {};
+  if (!data.visitOverrides[visitKey]) {
+    // Clone from group defaults
+    data.visitOverrides[visitKey] = getVisitTasks(g, visitKey, data).map(t => ({ ...t }));
+  }
+
+  data.visitOverrides[visitKey][ti].done = !data.visitOverrides[visitKey][ti].done;
+  vpSave(data);
+  renderChecklist(gi, visitKey, data);
+  // Refresh the tile in the background (will apply when navigating back)
+}
+
+function deleteTask(gi, visitKey, ti) {
+  const data = vpLoad();
+  const g = data.groups[gi];
+  if (!data.visitOverrides) data.visitOverrides = {};
+  if (!data.visitOverrides[visitKey]) {
+    data.visitOverrides[visitKey] = getVisitTasks(g, visitKey, data).map(t => ({ ...t }));
+  }
+  data.visitOverrides[visitKey].splice(ti, 1);
+  vpSave(data);
+  renderChecklist(gi, visitKey, data);
+}
+
+function addCustomTask() {
+  const input = document.getElementById('clCustomTaskInput');
+  const label = input.value.trim();
+  if (!label) return;
+
+  const data = vpLoad();
+  const g = data.groups[currentGroupIdx];
+  if (!data.visitOverrides) data.visitOverrides = {};
+  if (!data.visitOverrides[currentVisitKey]) {
+    data.visitOverrides[currentVisitKey] = getVisitTasks(g, currentVisitKey, data).map(t => ({ ...t }));
+  }
+  data.visitOverrides[currentVisitKey].push({ id: 'custom_' + Date.now(), icon: '📌', label, done: false });
+  vpSave(data);
+  input.value = '';
+  renderChecklist(currentGroupIdx, currentVisitKey, data);
+}
+
+function closeChecklistView() {
+  document.getElementById('visitChecklistView').style.display = 'none';
+  document.getElementById('visitGroupsList').style.display = 'block';
+  currentGroupIdx = null; currentVisitKey = null;
+  renderVisitPlanner();
+}
+
+// ── Tile expand/collapse ──
+function toggleTileExpand(tileId) {
+  const tile   = document.getElementById(tileId);
+  const expand = document.getElementById(tileId + '_expand');
+  if (!tile || !expand) return;
+  const isOpen = tile.classList.toggle('expanded');
+  expand.style.display = isOpen ? 'block' : 'none';
+}
+
+// Toggle a task directly from the tile expand panel without navigating away
+function toggleTaskFromTile(gi, visitKey, ti, chipEl) {
+  const data = vpLoad();
+  const g = data.groups[gi];
+  if (!data.visitOverrides) data.visitOverrides = {};
+  if (!data.visitOverrides[visitKey]) {
+    data.visitOverrides[visitKey] = getVisitTasks(g, visitKey, data).map(t => ({ ...t }));
+  }
+  data.visitOverrides[visitKey][ti].done = !data.visitOverrides[visitKey][ti].done;
+  vpSave(data);
+
+  // Update chip UI in-place without full re-render
+  const isDone = data.visitOverrides[visitKey][ti].done;
+  chipEl.classList.toggle('done', isDone);
+  const check = chipEl.querySelector('.tile-chip-check');
+  if (check) check.textContent = isDone ? '✓' : '';
+
+  // Update tile header (progress bar + status + state class)
+  refreshTileSummary(gi, visitKey, data);
+}
+
+function refreshTileSummary(gi, visitKey, data) {
+  const g = data.groups[gi];
+  const tasks   = getVisitTasks(g, visitKey, data);
+  const total   = tasks.length;
+  const checked = tasks.filter(t => t.done).length;
+  const pct     = total > 0 ? Math.round(checked / total * 100) : 0;
+  const isComplete = total > 0 && checked === total;
+  const isPartial  = checked > 0 && checked < total;
+  const tileId = `tile_${gi}_${visitKey.replace(/-/g,'').replace('_','')}`;
+  const tile = document.getElementById(tileId);
+  if (!tile) return;
+
+  tile.classList.toggle('complete', isComplete);
+  tile.classList.toggle('partial', isPartial);
+  const bar    = tile.querySelector('.visit-tile-progress-bar');
+  const status = tile.querySelector('.visit-tile-status');
+  const check  = tile.querySelector('.visit-tile-check');
+  if (bar)    bar.style.width = pct + '%';
+  if (status) status.textContent = isComplete ? '✓ Complete' : isPartial ? `${checked}/${total} done` : total > 0 ? `${total} tasks` : 'No tasks';
+  if (check)  check.style.opacity = isComplete ? '1' : '0';
+}
+
+// ── Visit Group Modal ──
+let editingGroupIdx = null;
+
+const TIME_WINDOWS = [
+  { value: 'nopref',  label: 'No preference (6am–10pm)' },
+  { value: 'morning', label: 'Morning (6am–12pm)' },
+  { value: 'midday',  label: 'Midday (11am–4pm)' },
+  { value: 'evening', label: 'Evening (4pm–10pm)' },
+];
+
+const DURATIONS = ['20', '45', '60'];
+
+function openVisitGroupModal(gi = null) {
+  editingGroupIdx = gi;
+  document.getElementById('vgModalTitle').textContent = gi !== null ? 'Edit Visit Group' : 'Add Visit Group';
+
+  const data = vpLoad();
+  const g = gi !== null ? data.groups[gi] : null;
+
+  // Pre-fill dates from reservation if adding new
+  document.getElementById('vgDateStart').value = g ? g.dateStart : (document.getElementById('dateStart').value || '');
+  document.getElementById('vgDateEnd').value   = g ? g.dateEnd   : (document.getElementById('dateEnd').value   || '');
+
+  // Visit rows
+  const rowsEl = document.getElementById('vgVisitRows');
+  rowsEl.innerHTML = '';
+  const visits = g ? g.visitsPerDay : [{ timeWindow: 'nopref', duration: '20' }];
+  visits.forEach(v => addVgVisitRow(v));
+
+  // Task pills — pass existing tasks (with freq) or fresh suggestions
+  renderVgTaskPills(g ? g.defaultTasks : getSuggestedTaskIds().map(id => ({ id, freq: 'every' })));
+
+  document.getElementById('visitGroupModal').style.display = 'flex';
+}
+
+function addVgVisitRow(preset = null) {
+  const rowsEl = document.getElementById('vgVisitRows');
+  const div = document.createElement('div');
+  div.className = 'vg-visit-row';
+  div.innerHTML = `
+    <select class="q-select" style="max-width:none">
+      ${TIME_WINDOWS.map(tw => `<option value="${tw.value}" ${preset?.timeWindow === tw.value ? 'selected' : ''}>${tw.label}</option>`).join('')}
+    </select>
+    <select class="q-select" style="max-width:none">
+      ${DURATIONS.map(d => `<option value="${d}" ${preset?.duration === d ? 'selected' : ''}>${d} min</option>`).join('')}
+    </select>
+    <button class="vg-visit-row-remove" onclick="this.closest('.vg-visit-row').remove()" title="Remove">✕</button>`;
+  rowsEl.appendChild(div);
+}
+
+function renderVgTaskPills(selectedTasks = []) {
+  // selectedTasks can be array of strings (ids) or array of {id, freq} objects
+  const normalize = arr => arr.map(x => typeof x === 'string' ? { id: x, freq: 'every' } : x);
+  const sel = normalize(selectedTasks);
+  const el = document.getElementById('vgTaskPills');
+  el.innerHTML = ALL_TASKS.map(t => {
+    const match = sel.find(s => s.id === t.id);
+    const isSelected = !!match;
+    const freq = match?.freq || 'every';
+    return `<div class="vg-task-pill ${isSelected ? 'selected' : ''}" data-task-id="${t.id}" data-freq="${freq}" onclick="toggleVgTaskPill(this)">
+      ${t.icon} ${t.label}
+      ${isSelected ? `<span class="vg-task-freq" onclick="event.stopPropagation();cycleTaskFreq(this)" title="Click to change frequency">${freqLabel(freq)}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function freqLabel(freq) {
+  return freq === 'every' ? '· every visit' : freq === 'odd' ? '· every other (odd days)' : '· every other (even days)';
+}
+
+function toggleVgTaskPill(el) {
+  const wasSelected = el.classList.contains('selected');
+  el.classList.toggle('selected');
+  if (!wasSelected) {
+    el.dataset.freq = 'every';
+    el.innerHTML = el.innerHTML + `<span class="vg-task-freq" onclick="event.stopPropagation();cycleTaskFreq(this)" title="Click to change frequency">· every visit</span>`;
+  } else {
+    const badge = el.querySelector('.vg-task-freq');
+    if (badge) badge.remove();
+  }
+}
+
+function cycleTaskFreq(badge) {
+  const order = ['every', 'odd', 'even'];
+  const cur = badge.closest('.vg-task-pill').dataset.freq || 'every';
+  const next = order[(order.indexOf(cur) + 1) % order.length];
+  badge.closest('.vg-task-pill').dataset.freq = next;
+  badge.textContent = freqLabel(next);
+}
+
+function getSelectedTaskIds() {
+  return [...document.querySelectorAll('#vgTaskPills .vg-task-pill.selected')].map(el => ({
+    id: el.dataset.taskId, freq: el.dataset.freq || 'every'
+  }));
+}
+
+function getSuggestedTaskIdsFlat() {
+  return getSuggestedTaskIds(); // returns plain id strings
+}
+
+function getSuggestedTaskIds() {
+  const answers = getAnswers();
+  return ALL_TASKS.filter(t => t.always || (t.suggestIf && t.suggestIf(answers))).map(t => t.id);
+}
+
+function closeVisitGroupModal() {
+  document.getElementById('visitGroupModal').style.display = 'none';
+  editingGroupIdx = null;
+}
+
+function saveVisitGroup() {
+  const dateStart = document.getElementById('vgDateStart').value;
+  const dateEnd   = document.getElementById('vgDateEnd').value;
+  if (!dateStart || !dateEnd) { showToast('Please set start and end dates.', 'error'); return; }
+  if (dateStart > dateEnd)    { showToast('Start date must be before end date.', 'error'); return; }
+
+  const rows = document.querySelectorAll('#vgVisitRows .vg-visit-row');
+  if (!rows.length) { showToast('Add at least one visit per day.', 'error'); return; }
+
+  const visitsPerDay = [...rows].map(row => {
+    const selects = row.querySelectorAll('select');
+    return { timeWindow: selects[0].value, duration: selects[1].value };
+  });
+
+  const defaultTasks = getSelectedTaskIds(); // now array of {id, freq}
+
+  const data = vpLoad();
+  const group = { dateStart, dateEnd, visitsPerDay, defaultTasks };
+
+  if (editingGroupIdx !== null) {
+    data.groups[editingGroupIdx] = group;
+    showToast('Visit group updated.', 'success');
+  } else {
+    data.groups.push(group);
+    showToast('Visit group added.', 'success');
+  }
+
+  vpSave(data);
+  closeVisitGroupModal();
+  renderVisitPlanner();
+}
+
+function editVisitGroup(gi) { openVisitGroupModal(gi); }
+
+function deleteVisitGroup(gi) {
+  if (!confirm('Delete this visit group and all its check-off data?')) return;
+  const data = vpLoad();
+  // Also remove any visit overrides for this group's visits
+  const g = data.groups[gi];
+  const visits = expandGroupVisits(g);
+  visits.forEach(v => { if (data.visitOverrides) delete data.visitOverrides[v.visitKey]; });
+  data.groups.splice(gi, 1);
+  vpSave(data);
+  renderVisitPlanner();
+  showToast('Visit group deleted.');
+}
+
+function clearVisitData() {
+  if (!confirm('Clear all visit planner data for this reservation? This cannot be undone.')) return;
+  localStorage.removeItem(vpStorageKey());
+  renderVisitPlanner();
+  showToast('Visit data cleared.');
+}
+
+// ── Smart task suggestions ──
+function applySuggestedTasks() {
+  const suggested = getSuggestedTaskIds();
+  const data = vpLoad();
+  if (!data.groups.length) {
+    showToast('Add a visit group first, then apply suggestions.', 'error');
+    return;
+  }
+  // Apply to all groups' defaultTasks (merge, don't overwrite), freq-aware
+  data.groups.forEach(g => {
+    const existing = (g.defaultTasks || []).map(t => typeof t === 'string' ? { id: t, freq: 'every' } : t);
+    const existingIds = existing.map(t => t.id);
+    const toAdd = suggested.filter(id => !existingIds.includes(id)).map(id => ({ id, freq: 'every' }));
+    g.defaultTasks = [...existing, ...toAdd];
+  });
+  vpSave(data);
+  renderVisitPlanner();
+  showToast(`Suggestions applied to all visit groups.`, 'success');
+}
+
 </script>
 </body>
 </html>

@@ -27,6 +27,9 @@ function doPost(e) {
       headerRange.setFontColor('#ffffff');
       headerRange.setFontWeight('bold');
       sheet.setFrozenRows(1);
+    } else {
+      // Ensure Visit Schedule column exists on sheets created before this feature
+      ensureVisitScheduleColumn(sheet);
     }
 
     var resNum      = (data.reservationNum || '').toString().trim();
@@ -34,6 +37,9 @@ function doPost(e) {
 
     if (existingRow > 0) {
       // UPDATE — overwrite every cell in that row
+      // Pad row to match current sheet column count so Visit Schedule lands correctly
+      var sheetCols = sheet.getLastColumn();
+      while (row.length < sheetCols) row.push('');
       sheet.getRange(existingRow, 1, 1, row.length).setValues([row]);
     } else {
       // INSERT — append as a new row
@@ -114,7 +120,30 @@ function buildHeaders(sections) {
       }
     });
   });
+  headers.push('Visit Schedule');
   return headers;
+}
+
+// Ensures the 'Visit Schedule' column header exists in an already-created sheet.
+// If the sheet was created before this column was added, appends it to the header row.
+function ensureVisitScheduleColumn(sheet) {
+  var lastCol   = sheet.getLastColumn();
+  var headerRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var colIndex  = headerRow.indexOf('Visit Schedule'); // 0-based
+
+  if (colIndex === -1) {
+    // Column doesn't exist yet — append it to the header row
+    var newCol = lastCol + 1;
+    sheet.getRange(1, newCol).setValue('Visit Schedule');
+    // Apply the same header styling as the existing header row
+    var newHeaderCell = sheet.getRange(1, newCol);
+    newHeaderCell.setBackground('#1a3a5c');
+    newHeaderCell.setFontColor('#ffffff');
+    newHeaderCell.setFontWeight('bold');
+    return newCol; // 1-based
+  }
+
+  return colIndex + 1; // convert 0-based to 1-based
 }
 
 function buildRow(data) {
@@ -141,6 +170,8 @@ function buildRow(data) {
       }
     });
   });
+
+  row.push(data.visitSchedule || '');
 
   return row;
 }
