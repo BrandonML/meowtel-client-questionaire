@@ -1053,6 +1053,7 @@
     <div style="font-size:52px; margin-bottom:16px;">🐾</div>
     <h2 style="font-family:'Poppins', sans-serif; font-size:24px; margin-bottom:12px; color:var(--ink);">You're all set — thank you!</h2>
     <p style="font-size:14px; color:var(--muted); max-width:460px; margin:0 auto 24px; line-height:1.7;">Your answers have been received and your sitter is all set with everything they need. If you need to update anything before your reservation, just reach out directly.</p>
+    <p style="margin-bottom:24px;"><button onclick="reopenForm()" style="background:none; border:none; color:var(--blue); font-size:13px; cursor:pointer; text-decoration:underline; font-family:'DM Sans', sans-serif;">Need to update your answers?</button></p>
     <div style="background:var(--teal-lt); border-radius:8px; padding:18px 24px; display:inline-block; text-align:left; font-size:14px; line-height:2; color:var(--ink);">
       <div><strong>Brandon Scivolette</strong></div>
       <div>💬 Message on <strong>Meowtel</strong></div>
@@ -1754,6 +1755,14 @@ function initMode() {
   } catch(e) {
     console.error('Invalid client param', e);
   }
+}
+
+function reopenForm() {
+  // Clear the submission flag so the form re-opens instead of the confirmation screen
+  const resNum = (document.getElementById('reservationNum').value || '').trim();
+  if (resNum) localStorage.removeItem('meowtel_submitted_' + resNum);
+  // Reload the page — initMode will now fall through to the intake form
+  location.reload();
 }
 
 function showConfirmationScreen() {
