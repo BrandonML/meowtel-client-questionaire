@@ -1096,6 +1096,16 @@
 <div id="printView"></div>
 
 <script>
+function esc(str) {
+  if (!str) return '';
+  return str.toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const SECTIONS = [
   {
     title: "Access to the Home", subtitle: "Start here — most important",
@@ -1531,10 +1541,10 @@ function renderClientCards(rows, headers) {
     const end   = row[iEnd]   ? fmt(row[iEnd])   : '';
     const dates = start ? (end ? `${start} – ${end}` : start) : 'No dates';
     return `<div class="client-card">
-      <div class="client-card-name">🐱 ${name}</div>
-      <div class="client-card-meta">${dates}</div>
-      ${cats ? `<div class="client-card-meta">Cats: ${cats}</div>` : ''}
-      ${res  ? `<div class="client-card-meta">Res #${res}</div>`   : ''}
+      <div class="client-card-name">🐱 ${esc(name)}</div>
+      <div class="client-card-meta">${esc(dates)}</div>
+      ${cats ? `<div class="client-card-meta">Cats: ${esc(cats)}</div>` : ''}
+      ${res  ? `<div class="client-card-meta">Res #${esc(res)}</div>`   : ''}
       <div class="client-card-actions">
         <button class="btn btn-gold btn-sm" onclick="loadClientFromSheets(${idx})">Load</button>
       </div></div>`;
@@ -1850,11 +1860,11 @@ function buildPrintView() {
   const addr = addrParts.length ? addrParts.join(', ') : '';
 
   const resItems = [
-    name    ? `<div class="pv-res-item wide"><div class="pv-res-label">Client</div><div class="pv-res-value">${name}</div></div>` : '',
-    resNum  ? `<div class="pv-res-item"><div class="pv-res-label">Reservation #</div><div class="pv-res-value">${resNum}</div></div>` : '',
-    cats    ? `<div class="pv-res-item"><div class="pv-res-label">Cat(s)</div><div class="pv-res-value">${cats}</div></div>` : '',
-    dates   ? `<div class="pv-res-item wide"><div class="pv-res-label">Dates</div><div class="pv-res-value">${dates}</div></div>` : '',
-    addr    ? `<div class="pv-res-item full"><div class="pv-res-label">Address</div><div class="pv-res-value">${addr}</div></div>` : '',
+    name    ? `<div class="pv-res-item wide"><div class="pv-res-label">Client</div><div class="pv-res-value">${esc(name)}</div></div>` : '',
+    resNum  ? `<div class="pv-res-item"><div class="pv-res-label">Reservation #</div><div class="pv-res-value">${esc(resNum)}</div></div>` : '',
+    cats    ? `<div class="pv-res-item"><div class="pv-res-label">Cat(s)</div><div class="pv-res-value">${esc(cats)}</div></div>` : '',
+    dates   ? `<div class="pv-res-item wide"><div class="pv-res-label">Dates</div><div class="pv-res-value">${esc(dates)}</div></div>` : '',
+    addr    ? `<div class="pv-res-item full"><div class="pv-res-label">Address</div><div class="pv-res-value">${esc(addr)}</div></div>` : '',
   ].filter(Boolean).join('');
 
   const printedOn = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -1877,11 +1887,11 @@ function buildPrintView() {
       const val   = (answers[key] || '').trim();
       const notes = (answers[key + '_n'] || '').trim();
       if (!val && !notes) return; // skip unanswered
-      const notesHtml = notes ? `<div class="pv-notes">${notes}</div>` : '';
+      const notesHtml = notes ? `<div class="pv-notes">${esc(notes)}</div>` : '';
       items.push(`
         <div class="pv-item">
-          <div class="pv-q">${item.q}</div>
-          <div class="pv-a">${val || '—'}</div>
+          <div class="pv-q">${esc(item.q)}</div>
+          <div class="pv-a">${esc(val) || '—'}</div>
           ${notesHtml}
         </div>`);
     });
@@ -1979,11 +1989,11 @@ function showVisitSummary(res, vpData) {
   const addr  = [res.addrStreet, res.addrCity, res.addrState, res.addrZip].filter(Boolean).join(', ');
 
   const resItems = [
-    name   ? `<div class="vs-res-item"><div class="vs-res-label">Client</div><div class="vs-res-value">${name}</div></div>` : '',
-    res.reservationNum ? `<div class="vs-res-item"><div class="vs-res-label">Reservation #</div><div class="vs-res-value">${res.reservationNum}</div></div>` : '',
-    cats   ? `<div class="vs-res-item"><div class="vs-res-label">Cat(s)</div><div class="vs-res-value">${cats}</div></div>` : '',
-    dates  ? `<div class="vs-res-item"><div class="vs-res-label">Dates</div><div class="vs-res-value">${dates}</div></div>` : '',
-    addr   ? `<div class="vs-res-item"><div class="vs-res-label">Address</div><div class="vs-res-value">${addr}</div></div>` : '',
+    name   ? `<div class="vs-res-item"><div class="vs-res-label">Client</div><div class="vs-res-value">${esc(name)}</div></div>` : '',
+    res.reservationNum ? `<div class="vs-res-item"><div class="vs-res-label">Reservation #</div><div class="vs-res-value">${esc(res.reservationNum)}</div></div>` : '',
+    cats   ? `<div class="vs-res-item"><div class="vs-res-label">Cat(s)</div><div class="vs-res-value">${esc(cats)}</div></div>` : '',
+    dates  ? `<div class="vs-res-item"><div class="vs-res-label">Dates</div><div class="vs-res-value">${esc(dates)}</div></div>` : '',
+    addr   ? `<div class="vs-res-item"><div class="vs-res-label">Address</div><div class="vs-res-value">${esc(addr)}</div></div>` : '',
   ].filter(Boolean).join('');
   document.getElementById('vsResCard').innerHTML = resItems;
 
@@ -2046,8 +2056,8 @@ function showVisitSummary(res, vpData) {
       const taskRows = v.tasks.map(t => `
         <div class="vs-task-row ${t.done ? 'done' : 'skipped'}">
           <div class="vs-task-dot">${t.done ? '✓' : '–'}</div>
-          <div class="vs-task-icon">${t.icon}</div>
-          <div class="vs-task-label">${t.label}</div>
+          <div class="vs-task-icon">${esc(t.icon)}</div>
+          <div class="vs-task-label">${esc(t.label)}</div>
         </div>`).join('');
 
       return `<div class="vs-day-card">
