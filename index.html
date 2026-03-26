@@ -2558,10 +2558,6 @@ function getSelectedTaskIds() {
   }));
 }
 
-function getSuggestedTaskIdsFlat() {
-  return getSuggestedTaskIds(); // returns plain id strings
-}
-
 function getSuggestedTaskIds() {
   const answers = getAnswers();
   return ALL_TASKS.filter(t => t.always || (t.suggestIf && t.suggestIf(answers))).map(t => t.id);
