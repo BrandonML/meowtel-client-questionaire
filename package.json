@@ -1,0 +1,21 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "A self-hosted, single-file web app for cat sitting client intake and visit management. Built for use alongside [Meowtel](https://meowtel.com), it streamlines the meet-and-greet process, tracks per-visit tasks, and gives clients a clean way to submit their care preferences before a booking begins.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test tests/apps-script.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrandonML/meowtel-client-questionaire.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BrandonML/meowtel-client-questionaire/issues"
+  },
+  "homepage": "https://github.com/BrandonML/meowtel-client-questionaire#readme"
+}
